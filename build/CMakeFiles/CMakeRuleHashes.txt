@@ -1,4 +1,8 @@
 # Hashes of file build rules.
+efc0fea1550a751b096e33ed0cc6841b /home/ras/jhm_ws/devel/include/dh_gripper_msgs/GripperCtrl.h
+8563172fbe511ef64bd18eb394524ee7 /home/ras/jhm_ws/devel/include/dh_gripper_msgs/GripperRotCtrl.h
+78c275eee8256cade4bae7a88c6801e2 /home/ras/jhm_ws/devel/include/dh_gripper_msgs/GripperRotState.h
+d15c2cb6705fd2addf2395bf75b9ae00 /home/ras/jhm_ws/devel/include/dh_gripper_msgs/GripperState.h
 293877dc17985a620f2cdde97e07865c /home/ras/jhm_ws/devel/include/jaka_msgs/ClearError.h
 2a01feaabacffc6ef28cc77621ed1de3 /home/ras/jhm_ws/devel/include/jaka_msgs/GetFK.h
 d828a7c5bab722566b33c9d3887899c3 /home/ras/jhm_ws/devel/include/jaka_msgs/GetIK.h
@@ -12,6 +16,11 @@ c2a21117e070e795eb14ea6fe55d0e93 /home/ras/jhm_ws/devel/include/jaka_msgs/SetIO.
 8bc0a13ce798ec7489679887bee80b34 /home/ras/jhm_ws/devel/include/jaka_msgs/SetPayload.h
 19d0e4e466cbb3582b241a006fa6788d /home/ras/jhm_ws/devel/include/jaka_msgs/SetTcpFrame.h
 1a8108368667a563cd4a453b6924a941 /home/ras/jhm_ws/devel/include/jaka_msgs/SetUserFrame.h
+fdddddcbd7b1adb1a672c90d0d9f5858 /home/ras/jhm_ws/devel/lib/python3/dist-packages/dh_gripper_msgs/msg/_GripperCtrl.py
+179792e05da92e0a304c51355dc83c86 /home/ras/jhm_ws/devel/lib/python3/dist-packages/dh_gripper_msgs/msg/_GripperRotCtrl.py
+0d35fde5535d1094667be974c11d46e1 /home/ras/jhm_ws/devel/lib/python3/dist-packages/dh_gripper_msgs/msg/_GripperRotState.py
+13fc93be2275b914629d1a5b4faba1d0 /home/ras/jhm_ws/devel/lib/python3/dist-packages/dh_gripper_msgs/msg/_GripperState.py
+118d52f5ec4a28ebcade0cfe8c9ae350 /home/ras/jhm_ws/devel/lib/python3/dist-packages/dh_gripper_msgs/msg/__init__.py
 601cfe722fc6fc70dafcf6142d7cafba /home/ras/jhm_ws/devel/lib/python3/dist-packages/jaka_msgs/msg/_RobotMsg.py
 6c024590c76198faed01d0f46ee843f6 /home/ras/jhm_ws/devel/lib/python3/dist-packages/jaka_msgs/msg/__init__.py
 bcd7094c12dab8750a9e9f7f97255dc7 /home/ras/jhm_ws/devel/lib/python3/dist-packages/jaka_msgs/srv/_ClearError.py
@@ -27,6 +36,10 @@ bffdeb2a41dd40d0d72aa24e9b6f118d /home/ras/jhm_ws/devel/lib/python3/dist-package
 f21c2a59a6555f159feb2f376426426c /home/ras/jhm_ws/devel/lib/python3/dist-packages/jaka_msgs/srv/_SetTcpFrame.py
 7256663944cdbdd009ccc51f67cf25e1 /home/ras/jhm_ws/devel/lib/python3/dist-packages/jaka_msgs/srv/_SetUserFrame.py
 6119f72b95a85e459a5475152500e63a /home/ras/jhm_ws/devel/lib/python3/dist-packages/jaka_msgs/srv/__init__.py
+e688be03fdd33964f8cb18e424490a01 /home/ras/jhm_ws/devel/share/common-lisp/ros/dh_gripper_msgs/msg/GripperCtrl.lisp
+daf120e8ab5c3a3cb1346b9e4f677ff9 /home/ras/jhm_ws/devel/share/common-lisp/ros/dh_gripper_msgs/msg/GripperRotCtrl.lisp
+e9a82eb916ad23fb6b177cd501c96b82 /home/ras/jhm_ws/devel/share/common-lisp/ros/dh_gripper_msgs/msg/GripperRotState.lisp
+256a8e3fed1d77f2ce2246cb6e652231 /home/ras/jhm_ws/devel/share/common-lisp/ros/dh_gripper_msgs/msg/GripperState.lisp
 05acca97341e7cffe2cd9cc46b68a1f0 /home/ras/jhm_ws/devel/share/common-lisp/ros/jaka_msgs/msg/RobotMsg.lisp
 1a5425eb419746e75959ab6fb52d4bac /home/ras/jhm_ws/devel/share/common-lisp/ros/jaka_msgs/srv/ClearError.lisp
 12b856dea57e6ec671998c6693c46e2d /home/ras/jhm_ws/devel/share/common-lisp/ros/jaka_msgs/srv/GetFK.lisp
@@ -40,6 +53,10 @@ a7b885d969677f34d1a38a480457b329 /home/ras/jhm_ws/devel/share/common-lisp/ros/ja
 7314b6222f24efa08cf3a8933729aa8d /home/ras/jhm_ws/devel/share/common-lisp/ros/jaka_msgs/srv/SetPayload.lisp
 c5a43e1c5c6fb1f6c34b6b14ebf91c7b /home/ras/jhm_ws/devel/share/common-lisp/ros/jaka_msgs/srv/SetTcpFrame.lisp
 2fe60817c332622c1dec8e435d02f9bf /home/ras/jhm_ws/devel/share/common-lisp/ros/jaka_msgs/srv/SetUserFrame.lisp
+ed0f2d72e8c977f2776153267a3efdb9 /home/ras/jhm_ws/devel/share/gennodejs/ros/dh_gripper_msgs/msg/GripperCtrl.js
+a8166f3bdfc4af8857132c322d765f81 /home/ras/jhm_ws/devel/share/gennodejs/ros/dh_gripper_msgs/msg/GripperRotCtrl.js
+0072e71055152eb116b856fee98e041e /home/ras/jhm_ws/devel/share/gennodejs/ros/dh_gripper_msgs/msg/GripperRotState.js
+9cea16f90c8f89083ace62766e0fcaea /home/ras/jhm_ws/devel/share/gennodejs/ros/dh_gripper_msgs/msg/GripperState.js
 ae809a3e02b086b71d04b83bd11aee1b /home/ras/jhm_ws/devel/share/gennodejs/ros/jaka_msgs/msg/RobotMsg.js
 f96e5c6165a0605e995d16ff022f7ecd /home/ras/jhm_ws/devel/share/gennodejs/ros/jaka_msgs/srv/ClearError.js
 7b71f7d42afa114bf95324cce61aba54 /home/ras/jhm_ws/devel/share/gennodejs/ros/jaka_msgs/srv/GetFK.js
@@ -53,6 +70,11 @@ d885e2529b0ed5a28e434d141f2c1a21 /home/ras/jhm_ws/devel/share/gennodejs/ros/jaka
 0e38d5f718566ac0094933c00a95a763 /home/ras/jhm_ws/devel/share/gennodejs/ros/jaka_msgs/srv/SetPayload.js
 20bcafd16520e17665ac41bb7d8cbd00 /home/ras/jhm_ws/devel/share/gennodejs/ros/jaka_msgs/srv/SetTcpFrame.js
 ab44b52a349b9a79b3ccbcaff468f524 /home/ras/jhm_ws/devel/share/gennodejs/ros/jaka_msgs/srv/SetUserFrame.js
+f7e3263d0e31b750bd35c640893fd98f /home/ras/jhm_ws/devel/share/roseus/ros/dh_gripper_msgs/manifest.l
+41d75e294416cc16dbf2a4251c76e92d /home/ras/jhm_ws/devel/share/roseus/ros/dh_gripper_msgs/msg/GripperCtrl.l
+9df094a043fd827b0b2b66624f60cf44 /home/ras/jhm_ws/devel/share/roseus/ros/dh_gripper_msgs/msg/GripperRotCtrl.l
+ffae978d043729e6a1f510b146292141 /home/ras/jhm_ws/devel/share/roseus/ros/dh_gripper_msgs/msg/GripperRotState.l
+a58d16c9cef4c3b2c614275e084a20cf /home/ras/jhm_ws/devel/share/roseus/ros/dh_gripper_msgs/msg/GripperState.l
 b79c2aed31153ce5c31ee3860c5cc491 /home/ras/jhm_ws/devel/share/roseus/ros/jaka_msgs/manifest.l
 1948e52f17d010cb482b97a4903f5a85 /home/ras/jhm_ws/devel/share/roseus/ros/jaka_msgs/msg/RobotMsg.l
 11f3d536ad9478d1b5d73d32e9de8f52 /home/ras/jhm_ws/devel/share/roseus/ros/jaka_msgs/srv/ClearError.l
@@ -68,6 +90,15 @@ fda11a2b541e7163ced1aea184757451 /home/ras/jhm_ws/devel/share/roseus/ros/jaka_ms
 a2dda4323879d9ff9aa38df06efcc685 /home/ras/jhm_ws/devel/share/roseus/ros/jaka_msgs/srv/SetTcpFrame.l
 877c0b77a34ca0e7188de8d1a3b683bf /home/ras/jhm_ws/devel/share/roseus/ros/jaka_msgs/srv/SetUserFrame.l
 1b08d69f1dcbd03dfb012f442b64b172 CMakeFiles/clean_test_results
+781f293fd3ad1e9ff7733e6e1508070d dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperCtrl
+5c475b89fa02f5c16d98df6cad61667f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl
+dc5c8b8ff53a3fcad9145613e3a7af8b dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperRotState
+80733a7e47020c0dfbe275ff3af01e3f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperState
+9b7ebd05970ef27fbf64ae29f23e058a dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_cpp
+9b7ebd05970ef27fbf64ae29f23e058a dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_eus
+9b7ebd05970ef27fbf64ae29f23e058a dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_lisp
+9b7ebd05970ef27fbf64ae29f23e058a dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_nodejs
+9b7ebd05970ef27fbf64ae29f23e058a dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_py
 9d66b1c89d88c599acb7f9a4b9c85943 jaka_ros/jaka_msgs/CMakeFiles/_jaka_msgs_generate_messages_check_deps_ClearError
 546f6fa2f0e7469de09ba9aa1a3ca5c3 jaka_ros/jaka_msgs/CMakeFiles/_jaka_msgs_generate_messages_check_deps_GetFK
 419b5931d939b13fc23e86201728243d jaka_ros/jaka_msgs/CMakeFiles/_jaka_msgs_generate_messages_check_deps_GetIK

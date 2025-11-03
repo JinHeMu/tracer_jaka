@@ -469,6 +469,21 @@ cpp_common_DIR:PATH=/opt/ros/noetic/share/cpp_common/cmake
 //The directory containing a CMake configuration file for cv_bridge.
 cv_bridge_DIR:PATH=/opt/ros/noetic/share/cv_bridge/cmake
 
+//Value Computed by CMake
+dh_gripper_driver_BINARY_DIR:STATIC=/home/ras/jhm_ws/build/dh_gripper_driver_ros/dh_gripper_driver
+
+//Value Computed by CMake
+dh_gripper_driver_SOURCE_DIR:STATIC=/home/ras/jhm_ws/src/dh_gripper_driver_ros/dh_gripper_driver
+
+//Value Computed by CMake
+dh_gripper_msgs_BINARY_DIR:STATIC=/home/ras/jhm_ws/build/dh_gripper_driver_ros/dh_gripper_msgs
+
+//The directory containing a CMake configuration file for dh_gripper_msgs.
+dh_gripper_msgs_DIR:PATH=/home/ras/jhm_ws/devel/share/dh_gripper_msgs/cmake
+
+//Value Computed by CMake
+dh_gripper_msgs_SOURCE_DIR:STATIC=/home/ras/jhm_ws/src/dh_gripper_driver_ros/dh_gripper_msgs
+
 //The directory containing a CMake configuration file for dynamic_reconfigure.
 dynamic_reconfigure_DIR:PATH=/opt/ros/noetic/share/dynamic_reconfigure/cmake
 
@@ -984,7 +999,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=21
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=23
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -1027,6 +1042,10 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Test COMPILER_SUPPORTS_CXX0X
+COMPILER_SUPPORTS_CXX0X:INTERNAL=1
+//Test COMPILER_SUPPORTS_CXX11
+COMPILER_SUPPORTS_CXX11:INTERNAL=1
 //Details about finding NumPy
 FIND_PACKAGE_MESSAGE_DETAILS_NumPy:INTERNAL=[/usr/lib/python3/dist-packages/numpy/core/include][1.17.4][v1.17.4(1.7)]
 //Details about finding OpenCV
