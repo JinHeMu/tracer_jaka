@@ -12,6 +12,10 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   tf2_ros
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  sensor_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -207,3 +211,6 @@ include_directories(
 # catkin_add_nosetests(test)
 add_executable(matrix_test src/matrix_test.cpp)
 target_link_libraries(matrix_test ${catkin_LIBRARIES})
+
+add_executable(jaka_pose_demo src/jaka_pose_demo.cpp)
+target_link_libraries(jaka_pose_demo ${catkin_LIBRARIES})

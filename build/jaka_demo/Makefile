@@ -80,6 +80,16 @@ install/local/fast: preinstall/fast
 	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
 .PHONY : install/local/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -90,17 +100,6 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
-
-# Special rule for the target test
-test:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
-	/usr/bin/ctest --force-new-ctest-process $(ARGS)
-.PHONY : test
-
-# Special rule for the target test
-test/fast: test
-
-.PHONY : test/fast
 
 # Special rule for the target install
 install: preinstall
@@ -114,16 +113,6 @@ install/fast: preinstall/fast
 	/usr/bin/cmake -P cmake_install.cmake
 .PHONY : install/fast
 
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -134,6 +123,17 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -168,19 +168,94 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule:
-	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
-.PHONY : jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
+jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
+.PHONY : jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
 
 # Convenience name for target.
-tf2_msgs_generate_messages_nodejs: jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
+visualization_msgs_generate_messages_nodejs: jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
 
-.PHONY : tf2_msgs_generate_messages_nodejs
+.PHONY : visualization_msgs_generate_messages_nodejs
 
 # fast build rule for target.
-tf2_msgs_generate_messages_nodejs/fast:
-	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/build.make jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/build
-.PHONY : tf2_msgs_generate_messages_nodejs/fast
+visualization_msgs_generate_messages_nodejs/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/build.make jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/build
+.PHONY : visualization_msgs_generate_messages_nodejs/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/tf_generate_messages_nodejs.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf_generate_messages_nodejs.dir/rule
+.PHONY : jaka_demo/CMakeFiles/tf_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_nodejs: jaka_demo/CMakeFiles/tf_generate_messages_nodejs.dir/rule
+
+.PHONY : tf_generate_messages_nodejs
+
+# fast build rule for target.
+tf_generate_messages_nodejs/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf_generate_messages_nodejs.dir/build.make jaka_demo/CMakeFiles/tf_generate_messages_nodejs.dir/build
+.PHONY : tf_generate_messages_nodejs/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_lisp: jaka_demo/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_lisp
+
+# fast build rule for target.
+visualization_msgs_generate_messages_lisp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/build.make jaka_demo/CMakeFiles/visualization_msgs_generate_messages_lisp.dir/build
+.PHONY : visualization_msgs_generate_messages_lisp/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/jaka_pose_demo.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/jaka_pose_demo.dir/rule
+.PHONY : jaka_demo/CMakeFiles/jaka_pose_demo.dir/rule
+
+# Convenience name for target.
+jaka_pose_demo: jaka_demo/CMakeFiles/jaka_pose_demo.dir/rule
+
+.PHONY : jaka_pose_demo
+
+# fast build rule for target.
+jaka_pose_demo/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/jaka_pose_demo.dir/build.make jaka_demo/CMakeFiles/jaka_pose_demo.dir/build
+.PHONY : jaka_pose_demo/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/std_srvs_generate_messages_eus.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/std_srvs_generate_messages_eus.dir/rule
+.PHONY : jaka_demo/CMakeFiles/std_srvs_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+std_srvs_generate_messages_eus: jaka_demo/CMakeFiles/std_srvs_generate_messages_eus.dir/rule
+
+.PHONY : std_srvs_generate_messages_eus
+
+# fast build rule for target.
+std_srvs_generate_messages_eus/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/std_srvs_generate_messages_eus.dir/build.make jaka_demo/CMakeFiles/std_srvs_generate_messages_eus.dir/build
+.PHONY : std_srvs_generate_messages_eus/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_cpp: jaka_demo/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_cpp
+
+# fast build rule for target.
+visualization_msgs_generate_messages_cpp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/build.make jaka_demo/CMakeFiles/visualization_msgs_generate_messages_cpp.dir/build
+.PHONY : visualization_msgs_generate_messages_cpp/fast
 
 # Convenience name for target.
 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule:
@@ -198,19 +273,79 @@ tf2_msgs_generate_messages_lisp/fast:
 .PHONY : tf2_msgs_generate_messages_lisp/fast
 
 # Convenience name for target.
-jaka_demo/CMakeFiles/matrix_test.dir/rule:
-	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/matrix_test.dir/rule
-.PHONY : jaka_demo/CMakeFiles/matrix_test.dir/rule
+jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
 
 # Convenience name for target.
-matrix_test: jaka_demo/CMakeFiles/matrix_test.dir/rule
+dynamic_reconfigure_generate_messages_cpp: jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
 
-.PHONY : matrix_test
+.PHONY : dynamic_reconfigure_generate_messages_cpp
 
 # fast build rule for target.
-matrix_test/fast:
-	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/matrix_test.dir/build.make jaka_demo/CMakeFiles/matrix_test.dir/build
-.PHONY : matrix_test/fast
+dynamic_reconfigure_generate_messages_cpp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build.make jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_cpp/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/tf_generate_messages_lisp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf_generate_messages_lisp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/tf_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_lisp: jaka_demo/CMakeFiles/tf_generate_messages_lisp.dir/rule
+
+.PHONY : tf_generate_messages_lisp
+
+# fast build rule for target.
+tf_generate_messages_lisp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf_generate_messages_lisp.dir/build.make jaka_demo/CMakeFiles/tf_generate_messages_lisp.dir/build
+.PHONY : tf_generate_messages_lisp/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
+.PHONY : jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+tf2_msgs_generate_messages_nodejs: jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/rule
+
+.PHONY : tf2_msgs_generate_messages_nodejs
+
+# fast build rule for target.
+tf2_msgs_generate_messages_nodejs/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/build.make jaka_demo/CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/build
+.PHONY : tf2_msgs_generate_messages_nodejs/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/moveit_ros_planning_gencfg.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/moveit_ros_planning_gencfg.dir/rule
+.PHONY : jaka_demo/CMakeFiles/moveit_ros_planning_gencfg.dir/rule
+
+# Convenience name for target.
+moveit_ros_planning_gencfg: jaka_demo/CMakeFiles/moveit_ros_planning_gencfg.dir/rule
+
+.PHONY : moveit_ros_planning_gencfg
+
+# fast build rule for target.
+moveit_ros_planning_gencfg/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/moveit_ros_planning_gencfg.dir/build.make jaka_demo/CMakeFiles/moveit_ros_planning_gencfg.dir/build
+.PHONY : moveit_ros_planning_gencfg/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
+.PHONY : jaka_demo/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_py: jaka_demo/CMakeFiles/visualization_msgs_generate_messages_py.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_py
+
+# fast build rule for target.
+visualization_msgs_generate_messages_py/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/visualization_msgs_generate_messages_py.dir/build.make jaka_demo/CMakeFiles/visualization_msgs_generate_messages_py.dir/build
+.PHONY : visualization_msgs_generate_messages_py/fast
 
 # Convenience name for target.
 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_eus.dir/rule:
@@ -228,6 +363,21 @@ tf2_msgs_generate_messages_eus/fast:
 .PHONY : tf2_msgs_generate_messages_eus/fast
 
 # Convenience name for target.
+jaka_demo/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
+.PHONY : jaka_demo/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+visualization_msgs_generate_messages_eus: jaka_demo/CMakeFiles/visualization_msgs_generate_messages_eus.dir/rule
+
+.PHONY : visualization_msgs_generate_messages_eus
+
+# fast build rule for target.
+visualization_msgs_generate_messages_eus/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/visualization_msgs_generate_messages_eus.dir/build.make jaka_demo/CMakeFiles/visualization_msgs_generate_messages_eus.dir/build
+.PHONY : visualization_msgs_generate_messages_eus/fast
+
+# Convenience name for target.
 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule:
 	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
 .PHONY : jaka_demo/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
@@ -243,6 +393,126 @@ tf2_msgs_generate_messages_py/fast:
 .PHONY : tf2_msgs_generate_messages_py/fast
 
 # Convenience name for target.
+jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
+.PHONY : jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
+
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_py: jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
+
+.PHONY : dynamic_reconfigure_generate_messages_py
+
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_py/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build.make jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_py/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule
+.PHONY : jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_eus: jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/rule
+
+.PHONY : dynamic_reconfigure_generate_messages_eus
+
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_eus/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/build.make jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_eus.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_eus/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
+.PHONY : jaka_demo/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
+
+# Convenience name for target.
+dynamic_reconfigure_gencfg: jaka_demo/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
+
+.PHONY : dynamic_reconfigure_gencfg
+
+# fast build rule for target.
+dynamic_reconfigure_gencfg/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/dynamic_reconfigure_gencfg.dir/build.make jaka_demo/CMakeFiles/dynamic_reconfigure_gencfg.dir/build
+.PHONY : dynamic_reconfigure_gencfg/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule
+.PHONY : jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_nodejs: jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/rule
+
+.PHONY : dynamic_reconfigure_generate_messages_nodejs
+
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_nodejs/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/build.make jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_nodejs.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_nodejs/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+dynamic_reconfigure_generate_messages_lisp: jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
+
+.PHONY : dynamic_reconfigure_generate_messages_lisp
+
+# fast build rule for target.
+dynamic_reconfigure_generate_messages_lisp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/build.make jaka_demo/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/build
+.PHONY : dynamic_reconfigure_generate_messages_lisp/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+std_srvs_generate_messages_lisp: jaka_demo/CMakeFiles/std_srvs_generate_messages_lisp.dir/rule
+
+.PHONY : std_srvs_generate_messages_lisp
+
+# fast build rule for target.
+std_srvs_generate_messages_lisp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/std_srvs_generate_messages_lisp.dir/build.make jaka_demo/CMakeFiles/std_srvs_generate_messages_lisp.dir/build
+.PHONY : std_srvs_generate_messages_lisp/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/tf_generate_messages_cpp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf_generate_messages_cpp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/tf_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_cpp: jaka_demo/CMakeFiles/tf_generate_messages_cpp.dir/rule
+
+.PHONY : tf_generate_messages_cpp
+
+# fast build rule for target.
+tf_generate_messages_cpp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf_generate_messages_cpp.dir/build.make jaka_demo/CMakeFiles/tf_generate_messages_cpp.dir/build
+.PHONY : tf_generate_messages_cpp/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule
+.PHONY : jaka_demo/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+std_srvs_generate_messages_cpp: jaka_demo/CMakeFiles/std_srvs_generate_messages_cpp.dir/rule
+
+.PHONY : std_srvs_generate_messages_cpp
+
+# fast build rule for target.
+std_srvs_generate_messages_cpp/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/std_srvs_generate_messages_cpp.dir/build.make jaka_demo/CMakeFiles/std_srvs_generate_messages_cpp.dir/build
+.PHONY : std_srvs_generate_messages_cpp/fast
+
+# Convenience name for target.
 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule:
 	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
 .PHONY : jaka_demo/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
@@ -256,6 +526,123 @@ tf2_msgs_generate_messages_cpp: jaka_demo/CMakeFiles/tf2_msgs_generate_messages_
 tf2_msgs_generate_messages_cpp/fast:
 	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/build.make jaka_demo/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/build
 .PHONY : tf2_msgs_generate_messages_cpp/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/tf_generate_messages_eus.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf_generate_messages_eus.dir/rule
+.PHONY : jaka_demo/CMakeFiles/tf_generate_messages_eus.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_eus: jaka_demo/CMakeFiles/tf_generate_messages_eus.dir/rule
+
+.PHONY : tf_generate_messages_eus
+
+# fast build rule for target.
+tf_generate_messages_eus/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf_generate_messages_eus.dir/build.make jaka_demo/CMakeFiles/tf_generate_messages_eus.dir/build
+.PHONY : tf_generate_messages_eus/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/tf_generate_messages_py.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/tf_generate_messages_py.dir/rule
+.PHONY : jaka_demo/CMakeFiles/tf_generate_messages_py.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_py: jaka_demo/CMakeFiles/tf_generate_messages_py.dir/rule
+
+.PHONY : tf_generate_messages_py
+
+# fast build rule for target.
+tf_generate_messages_py/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/tf_generate_messages_py.dir/build.make jaka_demo/CMakeFiles/tf_generate_messages_py.dir/build
+.PHONY : tf_generate_messages_py/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/matrix_test.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/matrix_test.dir/rule
+.PHONY : jaka_demo/CMakeFiles/matrix_test.dir/rule
+
+# Convenience name for target.
+matrix_test: jaka_demo/CMakeFiles/matrix_test.dir/rule
+
+.PHONY : matrix_test
+
+# fast build rule for target.
+matrix_test/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/matrix_test.dir/build.make jaka_demo/CMakeFiles/matrix_test.dir/build
+.PHONY : matrix_test/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/rule
+.PHONY : jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/rule
+
+# Convenience name for target.
+moveit_ros_manipulation_gencfg: jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/rule
+
+.PHONY : moveit_ros_manipulation_gencfg
+
+# fast build rule for target.
+moveit_ros_manipulation_gencfg/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/build.make jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/build
+.PHONY : moveit_ros_manipulation_gencfg/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/std_srvs_generate_messages_py.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/std_srvs_generate_messages_py.dir/rule
+.PHONY : jaka_demo/CMakeFiles/std_srvs_generate_messages_py.dir/rule
+
+# Convenience name for target.
+std_srvs_generate_messages_py: jaka_demo/CMakeFiles/std_srvs_generate_messages_py.dir/rule
+
+.PHONY : std_srvs_generate_messages_py
+
+# fast build rule for target.
+std_srvs_generate_messages_py/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/std_srvs_generate_messages_py.dir/build.make jaka_demo/CMakeFiles/std_srvs_generate_messages_py.dir/build
+.PHONY : std_srvs_generate_messages_py/fast
+
+# Convenience name for target.
+jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule
+.PHONY : jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+std_srvs_generate_messages_nodejs: jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/rule
+
+.PHONY : std_srvs_generate_messages_nodejs
+
+# fast build rule for target.
+std_srvs_generate_messages_nodejs/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build.make jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build
+.PHONY : std_srvs_generate_messages_nodejs/fast
+
+src/jaka_pose_demo.o: src/jaka_pose_demo.cpp.o
+
+.PHONY : src/jaka_pose_demo.o
+
+# target to build an object file
+src/jaka_pose_demo.cpp.o:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/jaka_pose_demo.dir/build.make jaka_demo/CMakeFiles/jaka_pose_demo.dir/src/jaka_pose_demo.cpp.o
+.PHONY : src/jaka_pose_demo.cpp.o
+
+src/jaka_pose_demo.i: src/jaka_pose_demo.cpp.i
+
+.PHONY : src/jaka_pose_demo.i
+
+# target to preprocess a source file
+src/jaka_pose_demo.cpp.i:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/jaka_pose_demo.dir/build.make jaka_demo/CMakeFiles/jaka_pose_demo.dir/src/jaka_pose_demo.cpp.i
+.PHONY : src/jaka_pose_demo.cpp.i
+
+src/jaka_pose_demo.s: src/jaka_pose_demo.cpp.s
+
+.PHONY : src/jaka_pose_demo.s
+
+# target to generate assembly for a file
+src/jaka_pose_demo.cpp.s:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/jaka_pose_demo.dir/build.make jaka_demo/CMakeFiles/jaka_pose_demo.dir/src/jaka_pose_demo.cpp.s
+.PHONY : src/jaka_pose_demo.cpp.s
 
 src/matrix_test.o: src/matrix_test.cpp.o
 
@@ -292,17 +679,44 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install/local"
-	@echo "... edit_cache"
-	@echo "... test"
-	@echo "... tf2_msgs_generate_messages_nodejs"
-	@echo "... install"
 	@echo "... list_install_components"
-	@echo "... rebuild_cache"
+	@echo "... visualization_msgs_generate_messages_nodejs"
+	@echo "... tf_generate_messages_nodejs"
+	@echo "... visualization_msgs_generate_messages_lisp"
+	@echo "... jaka_pose_demo"
+	@echo "... std_srvs_generate_messages_eus"
+	@echo "... visualization_msgs_generate_messages_cpp"
 	@echo "... tf2_msgs_generate_messages_lisp"
-	@echo "... matrix_test"
+	@echo "... edit_cache"
+	@echo "... dynamic_reconfigure_generate_messages_cpp"
+	@echo "... tf_generate_messages_lisp"
+	@echo "... tf2_msgs_generate_messages_nodejs"
+	@echo "... moveit_ros_planning_gencfg"
+	@echo "... install"
+	@echo "... visualization_msgs_generate_messages_py"
+	@echo "... rebuild_cache"
 	@echo "... tf2_msgs_generate_messages_eus"
+	@echo "... visualization_msgs_generate_messages_eus"
 	@echo "... tf2_msgs_generate_messages_py"
+	@echo "... dynamic_reconfigure_generate_messages_py"
+	@echo "... dynamic_reconfigure_generate_messages_eus"
+	@echo "... dynamic_reconfigure_gencfg"
+	@echo "... dynamic_reconfigure_generate_messages_nodejs"
+	@echo "... dynamic_reconfigure_generate_messages_lisp"
+	@echo "... std_srvs_generate_messages_lisp"
+	@echo "... tf_generate_messages_cpp"
+	@echo "... std_srvs_generate_messages_cpp"
 	@echo "... tf2_msgs_generate_messages_cpp"
+	@echo "... tf_generate_messages_eus"
+	@echo "... tf_generate_messages_py"
+	@echo "... matrix_test"
+	@echo "... moveit_ros_manipulation_gencfg"
+	@echo "... test"
+	@echo "... std_srvs_generate_messages_py"
+	@echo "... std_srvs_generate_messages_nodejs"
+	@echo "... src/jaka_pose_demo.o"
+	@echo "... src/jaka_pose_demo.i"
+	@echo "... src/jaka_pose_demo.s"
 	@echo "... src/matrix_test.o"
 	@echo "... src/matrix_test.i"
 	@echo "... src/matrix_test.s"
