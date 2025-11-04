@@ -1,8 +1,0 @@
-prefix=/home/a/jaka_zu5/devel
-
-Name: tracer_jaka_zu5_moveit_config
-Description: Description of tracer_jaka_zu5_moveit_config
-Version: 0.3.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
