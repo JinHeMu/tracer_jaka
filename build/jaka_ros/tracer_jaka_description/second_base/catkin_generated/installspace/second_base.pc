@@ -1,8 +1,0 @@
-prefix=/home/a/jaka_zu5/install
-
-Name: second_base
-Description: Description of second_base
-Version: 1.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
