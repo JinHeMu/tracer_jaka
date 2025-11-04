@@ -168,6 +168,21 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
+jaka_demo/CMakeFiles/object_recognition.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/object_recognition.dir/rule
+.PHONY : jaka_demo/CMakeFiles/object_recognition.dir/rule
+
+# Convenience name for target.
+object_recognition: jaka_demo/CMakeFiles/object_recognition.dir/rule
+
+.PHONY : object_recognition
+
+# fast build rule for target.
+object_recognition/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/object_recognition.dir/build.make jaka_demo/CMakeFiles/object_recognition.dir/build
+.PHONY : object_recognition/fast
+
+# Convenience name for target.
 jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule:
 	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
 .PHONY : jaka_demo/CMakeFiles/visualization_msgs_generate_messages_nodejs.dir/rule
@@ -573,6 +588,21 @@ matrix_test/fast:
 .PHONY : matrix_test/fast
 
 # Convenience name for target.
+jaka_demo/CMakeFiles/cv_hsv.dir/rule:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/cv_hsv.dir/rule
+.PHONY : jaka_demo/CMakeFiles/cv_hsv.dir/rule
+
+# Convenience name for target.
+cv_hsv: jaka_demo/CMakeFiles/cv_hsv.dir/rule
+
+.PHONY : cv_hsv
+
+# fast build rule for target.
+cv_hsv/fast:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/cv_hsv.dir/build.make jaka_demo/CMakeFiles/cv_hsv.dir/build
+.PHONY : cv_hsv/fast
+
+# Convenience name for target.
 jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/rule:
 	cd /home/a/jaka_zu5/build && $(MAKE) -f CMakeFiles/Makefile2 jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/rule
 .PHONY : jaka_demo/CMakeFiles/moveit_ros_manipulation_gencfg.dir/rule
@@ -616,6 +646,33 @@ std_srvs_generate_messages_nodejs: jaka_demo/CMakeFiles/std_srvs_generate_messag
 std_srvs_generate_messages_nodejs/fast:
 	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build.make jaka_demo/CMakeFiles/std_srvs_generate_messages_nodejs.dir/build
 .PHONY : std_srvs_generate_messages_nodejs/fast
+
+src/cv_hsv.o: src/cv_hsv.cpp.o
+
+.PHONY : src/cv_hsv.o
+
+# target to build an object file
+src/cv_hsv.cpp.o:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/cv_hsv.dir/build.make jaka_demo/CMakeFiles/cv_hsv.dir/src/cv_hsv.cpp.o
+.PHONY : src/cv_hsv.cpp.o
+
+src/cv_hsv.i: src/cv_hsv.cpp.i
+
+.PHONY : src/cv_hsv.i
+
+# target to preprocess a source file
+src/cv_hsv.cpp.i:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/cv_hsv.dir/build.make jaka_demo/CMakeFiles/cv_hsv.dir/src/cv_hsv.cpp.i
+.PHONY : src/cv_hsv.cpp.i
+
+src/cv_hsv.s: src/cv_hsv.cpp.s
+
+.PHONY : src/cv_hsv.s
+
+# target to generate assembly for a file
+src/cv_hsv.cpp.s:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/cv_hsv.dir/build.make jaka_demo/CMakeFiles/cv_hsv.dir/src/cv_hsv.cpp.s
+.PHONY : src/cv_hsv.cpp.s
 
 src/jaka_pose_demo.o: src/jaka_pose_demo.cpp.o
 
@@ -671,6 +728,33 @@ src/matrix_test.cpp.s:
 	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/matrix_test.dir/build.make jaka_demo/CMakeFiles/matrix_test.dir/src/matrix_test.cpp.s
 .PHONY : src/matrix_test.cpp.s
 
+src/object_recognition.o: src/object_recognition.cpp.o
+
+.PHONY : src/object_recognition.o
+
+# target to build an object file
+src/object_recognition.cpp.o:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/object_recognition.dir/build.make jaka_demo/CMakeFiles/object_recognition.dir/src/object_recognition.cpp.o
+.PHONY : src/object_recognition.cpp.o
+
+src/object_recognition.i: src/object_recognition.cpp.i
+
+.PHONY : src/object_recognition.i
+
+# target to preprocess a source file
+src/object_recognition.cpp.i:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/object_recognition.dir/build.make jaka_demo/CMakeFiles/object_recognition.dir/src/object_recognition.cpp.i
+.PHONY : src/object_recognition.cpp.i
+
+src/object_recognition.s: src/object_recognition.cpp.s
+
+.PHONY : src/object_recognition.s
+
+# target to generate assembly for a file
+src/object_recognition.cpp.s:
+	cd /home/a/jaka_zu5/build && $(MAKE) -f jaka_demo/CMakeFiles/object_recognition.dir/build.make jaka_demo/CMakeFiles/object_recognition.dir/src/object_recognition.cpp.s
+.PHONY : src/object_recognition.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -679,6 +763,7 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install/local"
+	@echo "... object_recognition"
 	@echo "... list_install_components"
 	@echo "... visualization_msgs_generate_messages_nodejs"
 	@echo "... tf_generate_messages_nodejs"
@@ -710,16 +795,23 @@ help:
 	@echo "... tf_generate_messages_eus"
 	@echo "... tf_generate_messages_py"
 	@echo "... matrix_test"
+	@echo "... cv_hsv"
 	@echo "... moveit_ros_manipulation_gencfg"
 	@echo "... test"
 	@echo "... std_srvs_generate_messages_py"
 	@echo "... std_srvs_generate_messages_nodejs"
+	@echo "... src/cv_hsv.o"
+	@echo "... src/cv_hsv.i"
+	@echo "... src/cv_hsv.s"
 	@echo "... src/jaka_pose_demo.o"
 	@echo "... src/jaka_pose_demo.i"
 	@echo "... src/jaka_pose_demo.s"
 	@echo "... src/matrix_test.o"
 	@echo "... src/matrix_test.i"
 	@echo "... src/matrix_test.s"
+	@echo "... src/object_recognition.o"
+	@echo "... src/object_recognition.i"
+	@echo "... src/object_recognition.s"
 .PHONY : help
 
 

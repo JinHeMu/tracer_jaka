@@ -1533,6 +1533,318 @@ shape_msgs_generate_messages_lisp/fast:
 .PHONY : shape_msgs_generate_messages_lisp/fast
 
 #=============================================================================
+# Target rules for targets named dh_gripper_msgs_generate_messages
+
+# Build rule for target.
+dh_gripper_msgs_generate_messages: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_generate_messages
+.PHONY : dh_gripper_msgs_generate_messages
+
+# fast build rule for target.
+dh_gripper_msgs_generate_messages/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages.dir/build
+.PHONY : dh_gripper_msgs_generate_messages/fast
+
+#=============================================================================
+# Target rules for targets named _dh_gripper_msgs_generate_messages_check_deps_GripperCtrl
+
+# Build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperCtrl: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _dh_gripper_msgs_generate_messages_check_deps_GripperCtrl
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperCtrl
+
+# fast build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperCtrl/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperCtrl.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperCtrl.dir/build
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperCtrl/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_gencpp
+
+# Build rule for target.
+dh_gripper_msgs_gencpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_gencpp
+.PHONY : dh_gripper_msgs_gencpp
+
+# fast build rule for target.
+dh_gripper_msgs_gencpp/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_gencpp.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_gencpp.dir/build
+.PHONY : dh_gripper_msgs_gencpp/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_generate_messages_py
+
+# Build rule for target.
+dh_gripper_msgs_generate_messages_py: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_generate_messages_py
+.PHONY : dh_gripper_msgs_generate_messages_py
+
+# fast build rule for target.
+dh_gripper_msgs_generate_messages_py/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_py.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_py.dir/build
+.PHONY : dh_gripper_msgs_generate_messages_py/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_generate_messages_nodejs
+
+# Build rule for target.
+dh_gripper_msgs_generate_messages_nodejs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_generate_messages_nodejs
+.PHONY : dh_gripper_msgs_generate_messages_nodejs
+
+# fast build rule for target.
+dh_gripper_msgs_generate_messages_nodejs/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_nodejs.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_nodejs.dir/build
+.PHONY : dh_gripper_msgs_generate_messages_nodejs/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_generate_messages_eus
+
+# Build rule for target.
+dh_gripper_msgs_generate_messages_eus: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_generate_messages_eus
+.PHONY : dh_gripper_msgs_generate_messages_eus
+
+# fast build rule for target.
+dh_gripper_msgs_generate_messages_eus/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_eus.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_eus.dir/build
+.PHONY : dh_gripper_msgs_generate_messages_eus/fast
+
+#=============================================================================
+# Target rules for targets named _dh_gripper_msgs_generate_messages_check_deps_GripperState
+
+# Build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperState: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _dh_gripper_msgs_generate_messages_check_deps_GripperState
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperState
+
+# fast build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperState/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperState.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperState.dir/build
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperState/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_genpy
+
+# Build rule for target.
+dh_gripper_msgs_genpy: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_genpy
+.PHONY : dh_gripper_msgs_genpy
+
+# fast build rule for target.
+dh_gripper_msgs_genpy/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_genpy.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_genpy.dir/build
+.PHONY : dh_gripper_msgs_genpy/fast
+
+#=============================================================================
+# Target rules for targets named _dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl
+
+# Build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl
+
+# fast build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl.dir/build
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl/fast
+
+#=============================================================================
+# Target rules for targets named _dh_gripper_msgs_generate_messages_check_deps_GripperRotState
+
+# Build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperRotState: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _dh_gripper_msgs_generate_messages_check_deps_GripperRotState
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperRotState
+
+# fast build rule for target.
+_dh_gripper_msgs_generate_messages_check_deps_GripperRotState/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperRotState.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/_dh_gripper_msgs_generate_messages_check_deps_GripperRotState.dir/build
+.PHONY : _dh_gripper_msgs_generate_messages_check_deps_GripperRotState/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_generate_messages_cpp
+
+# Build rule for target.
+dh_gripper_msgs_generate_messages_cpp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_generate_messages_cpp
+.PHONY : dh_gripper_msgs_generate_messages_cpp
+
+# fast build rule for target.
+dh_gripper_msgs_generate_messages_cpp/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_cpp.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_cpp.dir/build
+.PHONY : dh_gripper_msgs_generate_messages_cpp/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_generate_messages_lisp
+
+# Build rule for target.
+dh_gripper_msgs_generate_messages_lisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_generate_messages_lisp
+.PHONY : dh_gripper_msgs_generate_messages_lisp
+
+# fast build rule for target.
+dh_gripper_msgs_generate_messages_lisp/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_lisp.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_generate_messages_lisp.dir/build
+.PHONY : dh_gripper_msgs_generate_messages_lisp/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_genlisp
+
+# Build rule for target.
+dh_gripper_msgs_genlisp: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_genlisp
+.PHONY : dh_gripper_msgs_genlisp
+
+# fast build rule for target.
+dh_gripper_msgs_genlisp/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_genlisp.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_genlisp.dir/build
+.PHONY : dh_gripper_msgs_genlisp/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_gennodejs
+
+# Build rule for target.
+dh_gripper_msgs_gennodejs: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_gennodejs
+.PHONY : dh_gripper_msgs_gennodejs
+
+# fast build rule for target.
+dh_gripper_msgs_gennodejs/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_gennodejs.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_gennodejs.dir/build
+.PHONY : dh_gripper_msgs_gennodejs/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_msgs_geneus
+
+# Build rule for target.
+dh_gripper_msgs_geneus: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_msgs_geneus
+.PHONY : dh_gripper_msgs_geneus
+
+# fast build rule for target.
+dh_gripper_msgs_geneus/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_geneus.dir/build.make dh_gripper_driver_ros/dh_gripper_msgs/CMakeFiles/dh_gripper_msgs_geneus.dir/build
+.PHONY : dh_gripper_msgs_geneus/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_dh_robotics_ag95_description
+
+# Build rule for target.
+run_tests_dh_robotics_ag95_description: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 run_tests_dh_robotics_ag95_description
+.PHONY : run_tests_dh_robotics_ag95_description
+
+# fast build rule for target.
+run_tests_dh_robotics_ag95_description/fast:
+	$(MAKE) -f jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/run_tests_dh_robotics_ag95_description.dir/build.make jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/run_tests_dh_robotics_ag95_description.dir/build
+.PHONY : run_tests_dh_robotics_ag95_description/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_dh_robotics_ag95_description_roslaunch-check
+
+# Build rule for target.
+run_tests_dh_robotics_ag95_description_roslaunch-check: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 run_tests_dh_robotics_ag95_description_roslaunch-check
+.PHONY : run_tests_dh_robotics_ag95_description_roslaunch-check
+
+# fast build rule for target.
+run_tests_dh_robotics_ag95_description_roslaunch-check/fast:
+	$(MAKE) -f jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/run_tests_dh_robotics_ag95_description_roslaunch-check.dir/build.make jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/run_tests_dh_robotics_ag95_description_roslaunch-check.dir/build
+.PHONY : run_tests_dh_robotics_ag95_description_roslaunch-check/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_dh_robotics_ag95_description_roslaunch-check
+
+# Build rule for target.
+_run_tests_dh_robotics_ag95_description_roslaunch-check: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _run_tests_dh_robotics_ag95_description_roslaunch-check
+.PHONY : _run_tests_dh_robotics_ag95_description_roslaunch-check
+
+# fast build rule for target.
+_run_tests_dh_robotics_ag95_description_roslaunch-check/fast:
+	$(MAKE) -f jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/_run_tests_dh_robotics_ag95_description_roslaunch-check.dir/build.make jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/_run_tests_dh_robotics_ag95_description_roslaunch-check.dir/build
+.PHONY : _run_tests_dh_robotics_ag95_description_roslaunch-check/fast
+
+#=============================================================================
+# Target rules for targets named clean_test_results_dh_robotics_ag95_description
+
+# Build rule for target.
+clean_test_results_dh_robotics_ag95_description: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 clean_test_results_dh_robotics_ag95_description
+.PHONY : clean_test_results_dh_robotics_ag95_description
+
+# fast build rule for target.
+clean_test_results_dh_robotics_ag95_description/fast:
+	$(MAKE) -f jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/clean_test_results_dh_robotics_ag95_description.dir/build.make jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/clean_test_results_dh_robotics_ag95_description.dir/build
+.PHONY : clean_test_results_dh_robotics_ag95_description/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_dh_robotics_ag95_description_roslaunch-check_launch
+
+# Build rule for target.
+_run_tests_dh_robotics_ag95_description_roslaunch-check_launch: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _run_tests_dh_robotics_ag95_description_roslaunch-check_launch
+.PHONY : _run_tests_dh_robotics_ag95_description_roslaunch-check_launch
+
+# fast build rule for target.
+_run_tests_dh_robotics_ag95_description_roslaunch-check_launch/fast:
+	$(MAKE) -f jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/_run_tests_dh_robotics_ag95_description_roslaunch-check_launch.dir/build.make jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/_run_tests_dh_robotics_ag95_description_roslaunch-check_launch.dir/build
+.PHONY : _run_tests_dh_robotics_ag95_description_roslaunch-check_launch/fast
+
+#=============================================================================
+# Target rules for targets named _run_tests_dh_robotics_ag95_description
+
+# Build rule for target.
+_run_tests_dh_robotics_ag95_description: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 _run_tests_dh_robotics_ag95_description
+.PHONY : _run_tests_dh_robotics_ag95_description
+
+# fast build rule for target.
+_run_tests_dh_robotics_ag95_description/fast:
+	$(MAKE) -f jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/_run_tests_dh_robotics_ag95_description.dir/build.make jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/_run_tests_dh_robotics_ag95_description.dir/build
+.PHONY : _run_tests_dh_robotics_ag95_description/fast
+
+#=============================================================================
+# Target rules for targets named run_tests_dh_robotics_ag95_description_roslaunch-check_launch
+
+# Build rule for target.
+run_tests_dh_robotics_ag95_description_roslaunch-check_launch: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 run_tests_dh_robotics_ag95_description_roslaunch-check_launch
+.PHONY : run_tests_dh_robotics_ag95_description_roslaunch-check_launch
+
+# fast build rule for target.
+run_tests_dh_robotics_ag95_description_roslaunch-check_launch/fast:
+	$(MAKE) -f jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/run_tests_dh_robotics_ag95_description_roslaunch-check_launch.dir/build.make jaka_ros/tracer_jaka_description/dh_robotics_ag95_description/CMakeFiles/run_tests_dh_robotics_ag95_description_roslaunch-check_launch.dir/build
+.PHONY : run_tests_dh_robotics_ag95_description_roslaunch-check_launch/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_driver_test
+
+# Build rule for target.
+dh_gripper_driver_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_driver_test
+.PHONY : dh_gripper_driver_test
+
+# fast build rule for target.
+dh_gripper_driver_test/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_driver/CMakeFiles/dh_gripper_driver_test.dir/build.make dh_gripper_driver_ros/dh_gripper_driver/CMakeFiles/dh_gripper_driver_test.dir/build
+.PHONY : dh_gripper_driver_test/fast
+
+#=============================================================================
+# Target rules for targets named dh_gripper_driver
+
+# Build rule for target.
+dh_gripper_driver: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 dh_gripper_driver
+.PHONY : dh_gripper_driver
+
+# fast build rule for target.
+dh_gripper_driver/fast:
+	$(MAKE) -f dh_gripper_driver_ros/dh_gripper_driver/CMakeFiles/dh_gripper_driver.dir/build.make dh_gripper_driver_ros/dh_gripper_driver/CMakeFiles/dh_gripper_driver.dir/build
+.PHONY : dh_gripper_driver/fast
+
+#=============================================================================
 # Target rules for targets named jaka_description_xacro_generated_to_devel_space_
 
 # Build rule for target.
@@ -1544,6 +1856,19 @@ jaka_description_xacro_generated_to_devel_space_: cmake_check_build_system
 jaka_description_xacro_generated_to_devel_space_/fast:
 	$(MAKE) -f jaka_ros/jaka_description/CMakeFiles/jaka_description_xacro_generated_to_devel_space_.dir/build.make jaka_ros/jaka_description/CMakeFiles/jaka_description_xacro_generated_to_devel_space_.dir/build
 .PHONY : jaka_description_xacro_generated_to_devel_space_/fast
+
+#=============================================================================
+# Target rules for targets named object_recognition
+
+# Build rule for target.
+object_recognition: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 object_recognition
+.PHONY : object_recognition
+
+# fast build rule for target.
+object_recognition/fast:
+	$(MAKE) -f jaka_demo/CMakeFiles/object_recognition.dir/build.make jaka_demo/CMakeFiles/object_recognition.dir/build
+.PHONY : object_recognition/fast
 
 #=============================================================================
 # Target rules for targets named visualization_msgs_generate_messages_nodejs
@@ -1897,6 +2222,19 @@ matrix_test/fast:
 .PHONY : matrix_test/fast
 
 #=============================================================================
+# Target rules for targets named cv_hsv
+
+# Build rule for target.
+cv_hsv: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 cv_hsv
+.PHONY : cv_hsv
+
+# fast build rule for target.
+cv_hsv/fast:
+	$(MAKE) -f jaka_demo/CMakeFiles/cv_hsv.dir/build.make jaka_demo/CMakeFiles/cv_hsv.dir/build
+.PHONY : cv_hsv/fast
+
+#=============================================================================
 # Target rules for targets named moveit_ros_manipulation_gencfg
 
 # Build rule for target.
@@ -2092,7 +2430,32 @@ help:
 	@echo "... shape_msgs_generate_messages_eus"
 	@echo "... actionlib_msgs_generate_messages_lisp"
 	@echo "... shape_msgs_generate_messages_lisp"
+	@echo "... dh_gripper_msgs_generate_messages"
+	@echo "... _dh_gripper_msgs_generate_messages_check_deps_GripperCtrl"
+	@echo "... dh_gripper_msgs_gencpp"
+	@echo "... dh_gripper_msgs_generate_messages_py"
+	@echo "... dh_gripper_msgs_generate_messages_nodejs"
+	@echo "... dh_gripper_msgs_generate_messages_eus"
+	@echo "... _dh_gripper_msgs_generate_messages_check_deps_GripperState"
+	@echo "... dh_gripper_msgs_genpy"
+	@echo "... _dh_gripper_msgs_generate_messages_check_deps_GripperRotCtrl"
+	@echo "... _dh_gripper_msgs_generate_messages_check_deps_GripperRotState"
+	@echo "... dh_gripper_msgs_generate_messages_cpp"
+	@echo "... dh_gripper_msgs_generate_messages_lisp"
+	@echo "... dh_gripper_msgs_genlisp"
+	@echo "... dh_gripper_msgs_gennodejs"
+	@echo "... dh_gripper_msgs_geneus"
+	@echo "... run_tests_dh_robotics_ag95_description"
+	@echo "... run_tests_dh_robotics_ag95_description_roslaunch-check"
+	@echo "... _run_tests_dh_robotics_ag95_description_roslaunch-check"
+	@echo "... clean_test_results_dh_robotics_ag95_description"
+	@echo "... _run_tests_dh_robotics_ag95_description_roslaunch-check_launch"
+	@echo "... _run_tests_dh_robotics_ag95_description"
+	@echo "... run_tests_dh_robotics_ag95_description_roslaunch-check_launch"
+	@echo "... dh_gripper_driver_test"
+	@echo "... dh_gripper_driver"
 	@echo "... jaka_description_xacro_generated_to_devel_space_"
+	@echo "... object_recognition"
 	@echo "... visualization_msgs_generate_messages_nodejs"
 	@echo "... tf_generate_messages_nodejs"
 	@echo "... visualization_msgs_generate_messages_lisp"
@@ -2120,6 +2483,7 @@ help:
 	@echo "... tf_generate_messages_eus"
 	@echo "... tf_generate_messages_py"
 	@echo "... matrix_test"
+	@echo "... cv_hsv"
 	@echo "... moveit_ros_manipulation_gencfg"
 	@echo "... std_srvs_generate_messages_py"
 	@echo "... std_srvs_generate_messages_nodejs"

@@ -16,7 +16,15 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning
   moveit_ros_planning_interface
   sensor_msgs
+  cv_bridge
+  dynamic_reconfigure
 )
+
+find_package(OpenCV)
+include_directories(
+  ${OpenCV_INCLUDE_DIRS}
+)
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -214,3 +222,9 @@ target_link_libraries(matrix_test ${catkin_LIBRARIES})
 
 add_executable(jaka_pose_demo src/jaka_pose_demo.cpp)
 target_link_libraries(jaka_pose_demo ${catkin_LIBRARIES})
+
+add_executable(object_recognition src/object_recognition.cpp)
+target_link_libraries(object_recognition ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(cv_hsv src/cv_hsv.cpp)
+target_link_libraries(cv_hsv ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

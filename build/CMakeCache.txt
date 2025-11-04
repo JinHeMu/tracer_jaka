@@ -352,6 +352,9 @@ LSB_RELEASE_EXECUTABLE:FILEPATH=/usr/bin/lsb_release
 //Path to a program.
 NOSETESTS:FILEPATH=/usr/bin/nosetests3
 
+//The directory containing a CMake configuration file for OpenCV.
+OpenCV_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/opencv4
+
 //Path to a program.
 PYTHON_EXECUTABLE:FILEPATH=/usr/bin/python3
 
@@ -423,6 +426,30 @@ connector_description_SOURCE_DIR:STATIC=/home/a/jaka_zu5/src/jaka_ros/tracer_jak
 
 //The directory containing a CMake configuration file for cpp_common.
 cpp_common_DIR:PATH=/opt/ros/noetic/share/cpp_common/cmake
+
+//The directory containing a CMake configuration file for cv_bridge.
+cv_bridge_DIR:PATH=/opt/ros/noetic/share/cv_bridge/cmake
+
+//Value Computed by CMake
+dh_gripper_driver_BINARY_DIR:STATIC=/home/a/jaka_zu5/build/dh_gripper_driver_ros/dh_gripper_driver
+
+//Value Computed by CMake
+dh_gripper_driver_SOURCE_DIR:STATIC=/home/a/jaka_zu5/src/dh_gripper_driver_ros/dh_gripper_driver
+
+//Value Computed by CMake
+dh_gripper_msgs_BINARY_DIR:STATIC=/home/a/jaka_zu5/build/dh_gripper_driver_ros/dh_gripper_msgs
+
+//The directory containing a CMake configuration file for dh_gripper_msgs.
+dh_gripper_msgs_DIR:PATH=/home/a/jaka_zu5/devel/share/dh_gripper_msgs/cmake
+
+//Value Computed by CMake
+dh_gripper_msgs_SOURCE_DIR:STATIC=/home/a/jaka_zu5/src/dh_gripper_driver_ros/dh_gripper_msgs
+
+//Value Computed by CMake
+dh_robotics_ag95_description_BINARY_DIR:STATIC=/home/a/jaka_zu5/build/jaka_ros/tracer_jaka_description/dh_robotics_ag95_description
+
+//Value Computed by CMake
+dh_robotics_ag95_description_SOURCE_DIR:STATIC=/home/a/jaka_zu5/src/jaka_ros/tracer_jaka_description/dh_robotics_ag95_description
 
 //The directory containing a CMake configuration file for dynamic_reconfigure.
 dynamic_reconfigure_DIR:PATH=/opt/ros/noetic/share/dynamic_reconfigure/cmake
@@ -858,7 +885,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=17
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=19
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -901,6 +928,12 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Test COMPILER_SUPPORTS_CXX0X
+COMPILER_SUPPORTS_CXX0X:INTERNAL=1
+//Test COMPILER_SUPPORTS_CXX11
+COMPILER_SUPPORTS_CXX11:INTERNAL=1
+//Details about finding OpenCV
+FIND_PACKAGE_MESSAGE_DETAILS_OpenCV:INTERNAL=[/usr][v4.2.0()]
 //Details about finding PY_em
 FIND_PACKAGE_MESSAGE_DETAILS_PY_em:INTERNAL=[/usr/lib/python3/dist-packages/em.py][v()]
 //Details about finding PythonInterp

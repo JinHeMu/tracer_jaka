@@ -70,8 +70,6 @@ int main(int argc, char  *argv[])
     arm.setNamedTarget("up");
     arm.move();
     ros::shutdown();
-
-
     
 
     return 0;
