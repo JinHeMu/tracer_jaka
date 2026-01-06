@@ -1,0 +1,12 @@
+<launch>
+
+    <include file="$(find jaka_planner)/launch/moveit_server.launch">
+        <arg name="ip" value="10.5.5.100" />
+        <arg name="model" value="zu5" />
+    </include> 
+
+    <include file="$(find dh_gripper_driver)/launch/dh_gripper.launch">
+    </include> 
+
+
+</launch>

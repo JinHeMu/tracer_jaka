@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by
+Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="robotiq_realsense2_connector">
+  <link
+    name="connector_base_link">
+    <inertial>
+      <origin
+        xyz="0.00434937212978377 5.20417042793042E-18 0.0334255512696373"
+        rpy="0 0 0" />
+      <mass
+        value="0.00891029041853838" />
+      <inertia
+        ixx="3.67875098397923E-06"
+        ixy="9.3727693696127E-22"
+        ixz="-1.4437922233958E-07"
+        iyy="3.27524790321564E-06"
+        iyz="-1.30347421081159E-21"
+        izz="8.06494585207849E-07" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://connector_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://connector_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link name="to_d435_link" />
+
+  <joint
+    name="to_d435_joint"
+    type="fixed">
+    <origin
+      xyz="0.0152 0 0.0445"
+      rpy="0 0 0" />
+    <parent
+      link="connector_base_link" />
+    <child
+      link="to_d435_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+</robot>

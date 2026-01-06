@@ -1,0 +1,19 @@
+<launch>
+
+    <!-- <include file="$(find jaka_planner)/launch/moveit_server.launch">
+        <arg name="ip" value="10.5.5.100" />
+        <arg name="model" value="zu5" />
+    </include>  -->
+  
+
+    <!-- gripper -->
+    <include file="$(find dh_gripper_driver)/launch/dh_gripper.launch" />
+
+    <!-- D435i -->
+    <include file="$(find realsense2_camera)/launch/rs_rgbd.launch" />
+
+    <!-- moveit -->
+    <include file="$(find tracer_jaka_moveit_config)/launch/real.launch" />
+
+
+</launch>

@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+
+<robot name="tracer_jaka_zu5"
+    xmlns:xacro="http://ros.org/wiki/xacro">
+
+    
+  <xacro:include filename="$(find tracer_description)/urdf/tracer_v1.xacro" />   
+  <xacro:include filename="$(find aluminium)/urdf/aluminium.xacro" />
+  <xacro:include filename="$(find aluminium)/urdf/aluminium_2.xacro" />
+  <xacro:include filename="$(find aluminium)/urdf/aluminium_3.xacro" />
+  <xacro:include filename="$(find aluminium)/urdf/aluminium_4.xacro" />
+  <xacro:include filename="$(find second_base)/urdf/second_base.xacro" />
+  <xacro:include filename="$(find jaka_description)/urdf/jaka_zu5.urdf.xacro" />  
+  <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro" />
+  <xacro:include filename="$(find connector_description)/urdf/robotiq_realsense2_connector.urdf.xacro" />
+  <xacro:include filename="$(find dh_robotics_ag95_description)/urdf/dh_robotics_ag95_gripper.urdf.xacro" />
+  <xacro:include filename="$(find jk_se_vi_200)/urdf/JK-SE-VI-200.urdf" />
+
+
+  
+  <link name="gripper_center_link">
+  </link>
+
+  <link name="base_footprint">
+  </link>
+
+
+  <joint name="gripper_center_joint" type="fixed">
+    <origin xyz="0 0 0.22 " rpy="0 0 0" />
+    <parent link="Link_6_45" />
+    <child link="gripper_center_link" />
+  </joint>
+
+  <joint name="jk_se_vi_200_joint" type="fixed">
+    <origin xyz="0 0 0 " rpy="0 0 0" />
+    <parent link="Link_6_45" />
+    <child link="jk_se_vi_200_link" />
+  </joint>
+
+
+    <!-- 连接件宏调用 -->
+  <xacro:robotiq_realsense2_connector prefix="" parent="gripper_base_link">
+    <origin xyz="0 -0.0365 -0.005" rpy="3.14 -1.57 -1.57" />
+  </xacro:robotiq_realsense2_connector>
+
+    <!-- 相机宏调用 此处修改name是避免和标定得到的矩阵冲突-->
+  <xacro:sensor_d435 parent="to_d435_link" name="camera_1">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:sensor_d435>
+
+    <!-- 手抓宏调用 -->
+  <xacro:dh_robotics_ag95_gripper parent="jk_se_vi_200_link" prefix="">
+
+    <origin xyz="0 0 0.036" rpy="0 0 0" />
+    <!-- <origin xyz="0 0 0" rpy="0 -1.57 0" /> -->
+  </xacro:dh_robotics_ag95_gripper>
+
+  <!-- JOINT -->
+
+  <joint name="tracer_aluminium" type="fixed">
+    <origin xyz="-0.142 0.115 0.016 " rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="aluminium_base_link" />
+  </joint>
+
+  <joint name="tracer_aluminium_2" type="fixed">
+    <origin xyz="-0.142 -0.115 0.016 " rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="aluminium_2_base_link" />
+  </joint>
+
+  <joint name="tracer_aluminium_3" type="fixed">
+    <origin xyz="0.145 0.115 0.016 " rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="aluminium_3_base_link" />
+  </joint>
+
+  <joint name="tracer_aluminium_4" type="fixed">
+    <origin xyz="0.145 -0.115 0.016 " rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="aluminium_4_base_link" />
+  </joint>
+
+  <joint name="tracer_base" type="fixed">
+    <origin xyz="0.03 0 0.218 " rpy="0 0 0" />
+    <parent link="base_link" />
+    <child link="urbase_base_link" />
+  </joint>
+
+  <joint name="base_to_jaka" type="fixed">
+      <parent link="base_link"/>
+      <child link="jaka_base_link"/>
+      <origin xyz="0 0 0.218" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="base_footprint_to_trace" type="fixed">
+      <parent link="base_link"/>
+      <child link="base_footprint"/>
+      <origin xyz="0 0 -0.136" rpy="0 0 0"/>
+  </joint>
+
+  
+</robot>

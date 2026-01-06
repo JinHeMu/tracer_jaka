@@ -1,0 +1,13 @@
+<launch>
+
+	    <!-- 定义可接收的参数 -->
+    <arg name="ip" default="10.5.5.100" />
+    <arg name="model" default="zu5" />
+    <arg name="output" default="screen" />
+
+	<param name="ip" value="$(arg ip)" type="str"/>
+	<param name="model" value="$(arg model)" type="str"/>
+	<node pkg="jaka_planner" type="moveit_server" name="moveit_server" output="screen" />
+
+	
+</launch>

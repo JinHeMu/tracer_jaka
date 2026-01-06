@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="JK-SE-VI-200">
+  <link
+    name="jk_se_vi_200_link">
+    <inertial>
+      <origin
+        xyz="0.000111419619225602 -0.000368685485915551 0.00519325476237179"
+        rpy="0 0 0" />
+      <mass
+        value="0.113976498368271" />
+      <inertia
+        ixx="5.64946593588005E-05"
+        ixy="4.56990160256175E-07"
+        ixz="2.15115671353521E-08"
+        iyy="5.49156738067512E-05"
+        iyz="-2.31604435807102E-07"
+        izz="8.64640542438198E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://jk_se_vi_200/meshes/jk_se_vi_200_link.STL" scale="0.001 0.001 0.001"/>
+
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://jk_se_vi_200/meshes/jk_se_vi_200_link.STL" scale="0.001 0.001 0.001"/>
+
+      </geometry>
+    </collision>
+  </link>
+</robot>

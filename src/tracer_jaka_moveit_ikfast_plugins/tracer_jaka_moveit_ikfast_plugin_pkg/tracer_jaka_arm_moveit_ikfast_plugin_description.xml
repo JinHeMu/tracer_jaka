@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library path="lib/libtracer_jaka_arm_moveit_ikfast_plugin">
+  <class name="tracer_jaka_arm/IKFastKinematicsPlugin" type="tracer_jaka_arm::IKFastKinematicsPlugin" base_class_type="kinematics::KinematicsBase">
+    <description>IKFast61 plugin for closed-form kinematics of tracer_jaka arm</description>
+  </class>
+</library>
