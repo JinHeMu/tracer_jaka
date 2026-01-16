@@ -73,20 +73,20 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_configure(
     RCLCPP_ERROR(rclcpp::get_logger("JakaHardwareInterface"), "Failed to login to robot at %s", robot_ip_.c_str());
     return CallbackReturn::ERROR;
   }
-  // // Turn off servo at startup
-  robot_.servo_move_enable(false);
-  std::this_thread::sleep_for(chrono::milliseconds(500));
+  // // // Turn off servo at startup
+  // robot_.servo_move_enable(false);
+  // std::this_thread::sleep_for(chrono::milliseconds(500));
 
-  // // Filter param
-  robot_.servo_move_use_joint_LPF(5);
+  // // // Filter param
+  // robot_.servo_move_use_joint_LPF(5);
 
-  // // Power on + enable
-  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Powering on...");
-  robot_.power_on();
-  std::this_thread::sleep_for(std::chrono::seconds(8)); 
-  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Enabling robot...");
-  robot_.enable_robot();
-  std::this_thread::sleep_for(std::chrono::seconds(4)); 
+  // // // Power on + enable
+  // RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Powering on...");
+  // robot_.power_on();
+  // std::this_thread::sleep_for(std::chrono::seconds(8)); 
+  // RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Enabling robot...");
+  // robot_.enable_robot();
+  // std::this_thread::sleep_for(std::chrono::seconds(4)); 
 
   // 读取初始位置以同步 Command 和 State
   // 这一点至关重要：防止在控制器启动瞬间，command为0导致机器人猛冲
@@ -165,7 +165,7 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_deactivate(
 
   // 关闭 Servo 模式
   robot_.servo_move_enable(false);
-  robot_.disable_robot();
+  // robot_.disable_robot();
   // robot_.power_off();
 
 
@@ -203,7 +203,7 @@ hardware_interface::return_type JakaHardwareInterface::write(
 {
 
   // for (size_t i = 0; i < hw_commands_.size(); ++i) {
-  //   printf("j%zu:%.2f\t", i + 1, hw_commands_[i]);
+  //   printf("j%zu:%.10f\t", i + 1, hw_commands_[i]);
   // }
   // printf("\n");
 

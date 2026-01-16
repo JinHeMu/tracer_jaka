@@ -1,0 +1,23 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: jaka_description
+    relative_path: urdf/jaka_zu5.urdf
+  srdf:
+    relative_path: config/jaka_zu5.srdf
+  package_settings:
+    author_name: jinhemu
+    author_email: 490754775@qq.com
+    generated_timestamp: 1768463987
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
