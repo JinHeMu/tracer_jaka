@@ -28,6 +28,7 @@ jaka_arm_controller:
     state_interfaces:
       - position
       - velocity
+      - effort
 jaka_hand_controller:
   ros__parameters:
     joint: gripper_finger1_joint

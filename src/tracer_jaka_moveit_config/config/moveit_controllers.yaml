@@ -5,11 +5,9 @@ moveit_controller_manager: moveit_simple_controller_manager/MoveItSimpleControll
 moveit_simple_controller_manager:
   controller_names:
     - jaka_arm_controller
-    - jaka_hand_controller
 
   jaka_arm_controller:
     type: FollowJointTrajectory
-    action_ns: follow_joint_trajectory
     joints:
       - joint_1
       - joint_2
@@ -17,9 +15,4 @@ moveit_simple_controller_manager:
       - joint_4
       - joint_5
       - joint_6
-  jaka_hand_controller:
-    type: GripperCommand
-    joints:
-      - gripper_finger1_joint
-    action_ns: gripper_cmd
-    default: true
+    action_ns: follow_joint_trajectory
