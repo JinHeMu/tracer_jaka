@@ -1,4 +1,6 @@
 build/
 install/
 log/
+.vscode/
+.Trash-1000/
 
