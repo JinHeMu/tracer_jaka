@@ -995,7 +995,7 @@
       <inertia ixx="5.64946593588005E-05" ixy="4.56990160256175E-07" ixz="2.15115671353521E-08" iyy="5.49156738067512E-05" iyz="-2.31604435807102E-07" izz="8.64640542438198E-05"/>
     </inertial>
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.0315"/>
       <geometry>
         <mesh filename="package://jaka_description/meshes/jk_se_vi_200/meshes/jk_se_vi_200_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -1004,7 +1004,7 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 -0.0315"/>
       <geometry>
         <mesh filename="package://jaka_description/meshes/jk_se_vi_200/meshes/jk_se_vi_200_link.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -1020,7 +1020,7 @@
     <child link="gripper_center_link"/>
   </joint>
   <joint name="jk_se_vi_200_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0 "/>
+    <origin rpy="0 0 0.785398" xyz="0 0 0.0315 "/>
     <parent link="Link_6_45"/>
     <child link="jk_se_vi_200_link"/>
   </joint>
@@ -1097,7 +1097,7 @@
   <joint name="gripper_base_joint" type="fixed">
     <parent link="jk_se_vi_200_link"/>
     <child link="gripper_base_link"/>
-    <origin rpy="0 0 0" xyz="0 0 0.036"/>
+    <origin rpy="0 0 -0.7853" xyz="0 0 0.005"/>
   </joint>
   <link name="gripper_base_link">
     <visual>
