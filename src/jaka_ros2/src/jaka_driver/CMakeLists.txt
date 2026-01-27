@@ -30,6 +30,7 @@ include_directories(
 add_executable(jaka_edg_node src/jaka_edg_node.cpp)
 add_executable(jaka_login src/jaka_login.cpp)
 add_executable(jaka_logout src/jaka_logout.cpp)
+add_executable(jaka_tcp_sensor src/jaka_tcp_sensor.cpp)
 # =============================================
 # 4. 链接依赖
 # =============================================
@@ -56,6 +57,10 @@ target_link_libraries(jaka_login
 target_link_libraries(jaka_logout
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjakaAPI.so
 )
+
+target_link_libraries(jaka_tcp_sensor
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjakaAPI.so
+)
 # =============================================
 # 5. 安装规则 (Install)
 # =============================================
@@ -64,6 +69,7 @@ install(TARGETS
   jaka_edg_node
   jaka_login
   jaka_logout
+  jaka_tcp_sensor
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -27,19 +27,8 @@ jaka_arm_controller:
     state_interfaces:
       - position
       - velocity
-      - effort
 
 jaka_fts_broadcaster:
   ros__parameters:
-    sensor_name: tcp_fts_sensor
-
-    frame_id: jk_se_vi_200_link
-    interface_names:
-      force:
-        x: force.x
-        y: force.y
-        z: force.z
-      torque:
-        x: torque.x
-        y: torque.y
-        z: torque.z
+    sensor_name: "tcp_fts_sensor"
+    frame_id: "jk_se_vi_200_link"

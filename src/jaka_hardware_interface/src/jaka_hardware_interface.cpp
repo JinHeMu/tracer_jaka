@@ -197,7 +197,7 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_activate(
 {
 
   RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Activating... (Ensuring EDG is running)");
-  
+  robot_.servo_move_enable(true);
   // 可以在这里再次确保 EDG 开启，或者重置状态
   // 再次同步，因为从 Configure 到 Activate 可能有时间差
   robot_.edg_get_stat(&edg_state_);
@@ -215,8 +215,10 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_deactivate(
 
   RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Deactivating... Stopping EDG");
   
+  robot_.servo_move_enable(false);
   // 关闭 EDG 模式
   robot_.edg_init(false);
+
   
 
   return CallbackReturn::SUCCESS;
@@ -273,15 +275,18 @@ hardware_interface::return_type JakaHardwareInterface::write(
     }
   }
 
+  // printf("write joint value: %f, %f, %f, %f, %f, %f\n", 
+  //   joint_cmd_.jVal[0], joint_cmd_.jVal[1], joint_cmd_.jVal[2], 
+  //   joint_cmd_.jVal[3], joint_cmd_.jVal[4], joint_cmd_.jVal[5]);
   // 使用 EDG 伺服接口发送指令
   // MoveMode::ABS (绝对位置)
   // step_num = 1 (通常设为1，表示立即执行)
   
-  // errno_t ret = robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
+  errno_t ret = robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
 
-  // if (ret != ERR_SUCC) {
-  //    // 写入失败处理
-  // }
+  if (ret != ERR_SUCC) {
+     // 写入失败处理
+  }
 
   return hardware_interface::return_type::OK;
 }

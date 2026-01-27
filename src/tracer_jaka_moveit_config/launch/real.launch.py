@@ -164,7 +164,7 @@ def generate_launch_description():
         ros2_control_node,
         joint_state_broadcaster_spawner,
         jaka_arm_controller_spawner,
-
+        jaka_fts_broadcaster_spawner,   
         move_group_node,
         rviz_node,
     ])
