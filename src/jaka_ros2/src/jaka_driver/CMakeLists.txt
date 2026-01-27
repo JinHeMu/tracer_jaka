@@ -28,7 +28,8 @@ include_directories(
 # 3. 定义可执行文件
 # =============================================
 add_executable(jaka_edg_node src/jaka_edg_node.cpp)
-
+add_executable(jaka_login src/jaka_login.cpp)
+add_executable(jaka_logout src/jaka_logout.cpp)
 # =============================================
 # 4. 链接依赖
 # =============================================
@@ -40,6 +41,7 @@ ament_target_dependencies(jaka_edg_node
   tf2
 )
 
+
 # 4.2 链接 JAKA 的第三方库 (libjakaAPI.so)
 # 假设库文件位于: source_dir/lib/libjakaAPI.so
 # 我们使用 CMAKE_CURRENT_SOURCE_DIR 获取绝对路径
@@ -47,11 +49,21 @@ target_link_libraries(jaka_edg_node
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjakaAPI.so
 )
 
+target_link_libraries(jaka_login
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjakaAPI.so
+)
+
+target_link_libraries(jaka_logout
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/libjakaAPI.so
+)
 # =============================================
 # 5. 安装规则 (Install)
 # =============================================
 # 安装可执行文件到 lib/jaka_driver/ 下
-install(TARGETS jaka_edg_node
+install(TARGETS 
+  jaka_edg_node
+  jaka_login
+  jaka_logout
   DESTINATION lib/${PROJECT_NAME}
 )
 

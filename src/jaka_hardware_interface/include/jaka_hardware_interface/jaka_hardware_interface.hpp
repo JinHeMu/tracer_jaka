@@ -15,6 +15,7 @@
 #ifndef JAKA_HARDWARE_INTERFACE__JAKA_HARDWARE_INTERFACE_HPP_
 #define JAKA_HARDWARE_INTERFACE__JAKA_HARDWARE_INTERFACE_HPP_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -24,9 +25,10 @@
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp_lifecycle/state.hpp"
-// JAKA SDK
-#include "jaka_driver/JAKAZuRobot.h"   // 你实际的 include 路径按工程调整
 
+// JAKA SDK Headers
+#include "jaka_driver/JAKAZuRobot.h"
+#include "jaka_driver/jktypes.h"
 
 namespace jaka_hardware_interface
 {
@@ -57,17 +59,28 @@ public:
 
 private:
 
+  // JAKA Robot Object
   JAKAZuRobot robot_;
-
-  std::vector<double> hw_commands_;
-  std::vector<double> hw_states_;
-
-  // Configuration
-  std::string robot_ip_;
   
-  // JAKA SDK specific data structures
-  JointValue joint_position_fb_;  // For feedback
-  JointValue joint_position_cmd_; // For command
+  // IP Config
+  std::string robot_ip_;
+  std::string local_ip_; // PC IP for EDG UDP
+
+  // Data storage
+  EDGState edg_state_;        // EDG 全量状态
+  JointValue joint_cmd_;      // 发送给 EDG 的指令
+
+  // States (Position, Velocity, Effort)
+  std::vector<double> hw_position_states_;
+  std::vector<double> hw_velocity_states_;
+  std::vector<double> hw_effort_states_;
+
+  // 存储 6 维力数据的向量
+  std::vector<double> hw_fts_states_;
+
+  // Commands (Position only as per URDF)
+  std::vector<double> hw_position_commands_;
+
 };
 
 }  // namespace jaka_hardware_interface

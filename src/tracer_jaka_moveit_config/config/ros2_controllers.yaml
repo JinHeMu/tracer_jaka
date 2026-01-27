@@ -1,18 +1,17 @@
 # This config file is used by ros2_control
 controller_manager:
   ros__parameters:
-    update_rate: 100  # Hz
+    update_rate: 125  # Hz
 
     jaka_arm_controller:
       type: joint_trajectory_controller/JointTrajectoryController
 
 
-    jaka_hand_controller:
-      type: position_controllers/GripperActionController
-
-
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
+
+    jaka_fts_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
 
 jaka_arm_controller:
   ros__parameters:
@@ -29,6 +28,18 @@ jaka_arm_controller:
       - position
       - velocity
       - effort
-jaka_hand_controller:
+
+jaka_fts_broadcaster:
   ros__parameters:
-    joint: gripper_finger1_joint
+    sensor_name: tcp_fts_sensor
+
+    frame_id: jk_se_vi_200_link
+    interface_names:
+      force:
+        x: force.x
+        y: force.y
+        z: force.z
+      torque:
+        x: torque.x
+        y: torque.y
+        z: torque.z

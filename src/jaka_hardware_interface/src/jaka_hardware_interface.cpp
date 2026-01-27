@@ -13,16 +13,11 @@
 // limitations under the License.
 
 
-#include <chrono>
-#include <cmath>
-#include <limits>
-#include <memory>
-#include <vector>
-#include <thread>
-
 #include "jaka_hardware_interface/jaka_hardware_interface.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include <cmath>
+#include <thread>
 
 using namespace std;
 
@@ -36,8 +31,7 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_init(
     return CallbackReturn::ERROR;
   }
 
-  // 1. 获取参数: Robot IP
-  // 在 URDF 的 <hardware> 标签下配置: <param name="robot_ip">192.168.1.100</param>
+ // 1. 获取 Robot IP
   auto it = info_.hardware_parameters.find("robot_ip");
   if (it != info_.hardware_parameters.end())
   {
@@ -45,18 +39,32 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_init(
   }
   else
   {
-    RCLCPP_FATAL(
-      rclcpp::get_logger("JakaHardwareInterface"),
-      "Parameter'robot_ip' not set in URDF/ros2_control tag");
+    RCLCPP_FATAL(rclcpp::get_logger("JakaHardwareInterface"), "Parameter'robot_ip' not set");
     return CallbackReturn::ERROR;
   }
 
+  // 2. 获取 Local IP (EDG 必需)
+  auto it_local = info_.hardware_parameters.find("local_ip");
+  if (it_local != info_.hardware_parameters.end())
+  {
+    local_ip_ = it_local->second;
+  }
+  else
+  {
+    RCLCPP_FATAL(rclcpp::get_logger("JakaHardwareInterface"), "Parameter'local_ip' not set (Required for EDG)");
+    return CallbackReturn::ERROR;
+  }
 
-  // TODO(anyone): read parameters and initialize the hardware
-  hw_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  // 3. 初始化存储向量
+  hw_position_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_velocity_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_effort_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  hw_fts_states_.resize(6, std::numeric_limits<double>::quiet_NaN());
   
-  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Initialized Jaka Interface with IP: %s", robot_ip_.c_str());
+  hw_position_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+
+  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), 
+    "Jaka EDG Interface Init: Robot=%s, Local=%s", robot_ip_.c_str(), local_ip_.c_str());
 
   return CallbackReturn::SUCCESS;
 }
@@ -68,38 +76,58 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_configure(
 {
   // TODO(anyone): prepare the robot to be ready for read calls and write calls of some interfaces
 
-  // 1. 登录机器人
+RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Connecting to robot...");
+
+  // 1. 登录
   if (robot_.login_in(robot_ip_.c_str()) != ERR_SUCC) {
-    RCLCPP_ERROR(rclcpp::get_logger("JakaHardwareInterface"), "Failed to login to robot at %s", robot_ip_.c_str());
+    RCLCPP_ERROR(rclcpp::get_logger("JakaHardwareInterface"), "Login failed!");
     return CallbackReturn::ERROR;
   }
-  // // // Turn off servo at startup
-  // robot_.servo_move_enable(false);
-  // std::this_thread::sleep_for(chrono::milliseconds(500));
 
-  // // // Filter param
-  // robot_.servo_move_use_joint_LPF(5);
-
-  // // // Power on + enable
-  // RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Powering on...");
+  // 2. 上电与使能 (建议在外部或脚本中完成，也可在此处取消注释)
   // robot_.power_on();
-  // std::this_thread::sleep_for(std::chrono::seconds(8)); 
-  // RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Enabling robot...");
+  // std::this_thread::sleep_for(std::chrono::seconds(5));
   // robot_.enable_robot();
-  // std::this_thread::sleep_for(std::chrono::seconds(4)); 
+  // std::this_thread::sleep_for(std::chrono::seconds(5));
 
-  // 读取初始位置以同步 Command 和 State
-  // 这一点至关重要：防止在控制器启动瞬间，command为0导致机器人猛冲
-  if (robot_.get_joint_position(&joint_position_fb_) != ERR_SUCC) {
-    RCLCPP_ERROR(rclcpp::get_logger("JakaHardwareInterface"), "Failed to get initial joint position");
-    return CallbackReturn::ERROR;
+  // 3. 初始化 EDG 模式
+  // 参数: true(开启), 本机IP, 端口(默认10010), 模式(0:全功能)
+  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Initializing EDG UDP Stream...");
+  if (robot_.edg_init(true, local_ip_.c_str(), 10010, 0) != ERR_SUCC) {
+     RCLCPP_ERROR(rclcpp::get_logger("JakaHardwareInterface"), "Failed to init EDG! Check firewall/IP.");
+     return CallbackReturn::ERROR;
+  }
+  
+  // 给一点时间让 UDP 数据流建立
+  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+  // 4. 读取初始状态 (使用 EDG 接口)
+  // 尝试读取几次直到成功，确保数据流正常
+  int retry_count = 0;
+  while(true) {
+      if (robot_.edg_get_stat(&edg_state_) == ERR_SUCC) {
+          break;
+      }
+      retry_count++;
+      if(retry_count > 20) {
+          RCLCPP_ERROR(rclcpp::get_logger("JakaHardwareInterface"), "Timeout waiting for initial EDG data.");
+          return CallbackReturn::ERROR;
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 
+  // 5. 同步 Command 和 State，防止启动飞车
   for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
-    hw_states_[i] = joint_position_fb_.jVal[i];
-    hw_commands_[i] = hw_states_[i]; 
-    RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Joint %zu initial pos: %f", i, hw_states_[i]);
+    hw_position_states_[i] = edg_state_.jointVal.jVal[i];
+    hw_velocity_states_[i] = edg_state_.jointVel.jVel[i]; // rad/s
+    hw_effort_states_[i]   = edg_state_.jointTorq.jtorq[i]; // N.m
+    
+    hw_position_commands_[i] = hw_position_states_[i]; // 初始指令 = 当前位置
+    
+    RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Joint %zu init pos: %.4f", i, hw_position_states_[i]);
   }
+
+
   return CallbackReturn::SUCCESS;
 }
 
@@ -107,11 +135,45 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_configure(
 std::vector<hardware_interface::StateInterface> JakaHardwareInterface::export_state_interfaces()
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
+
   for (size_t i = 0; i < info_.joints.size(); ++i)
   {
+    // 导出 Position
     state_interfaces.emplace_back(hardware_interface::StateInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_[i]));
+      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_states_[i]));
+    
+    // 导出 Velocity (你的 XML 中有定义)
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_states_[i]));
+
+    // 导出 Effort (你的 XML 中有定义)
+    state_interfaces.emplace_back(hardware_interface::StateInterface(
+      info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
   }
+
+  if (info_.sensors.size() > 0) {
+      const auto& sensor = info_.sensors[0]; // 假设只有一个力传感器
+      
+      // 注意：这里的顺序必须和 hw_fts_states_ 的存储顺序一致
+      // 通常是 Fx, Fy, Fz, Tx, Ty, Tz
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+        sensor.name, "force.x", &hw_fts_states_[0]));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+        sensor.name, "force.y", &hw_fts_states_[1]));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+        sensor.name, "force.z", &hw_fts_states_[2]));
+      
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+        sensor.name, "torque.x", &hw_fts_states_[3]));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+        sensor.name, "torque.y", &hw_fts_states_[4]));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+        sensor.name, "torque.z", &hw_fts_states_[5]));
+        
+     RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), 
+        "Exported FT Sensor interfaces for: %s", sensor.name.c_str());
+  }
+
   return state_interfaces;
 }
 
@@ -122,9 +184,9 @@ std::vector<hardware_interface::CommandInterface> JakaHardwareInterface::export_
 
   for (size_t i = 0; i < info_.joints.size(); ++i)
   {
+    // 只导出 Position Command
     command_interfaces.emplace_back(hardware_interface::CommandInterface(
-      // TODO(anyone): insert correct interfaces
-      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_[i]));
+      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_commands_[i]));
   }
 
   return command_interfaces;
@@ -133,25 +195,16 @@ std::vector<hardware_interface::CommandInterface> JakaHardwareInterface::export_
 hardware_interface::CallbackReturn JakaHardwareInterface::on_activate(
   const rclcpp_lifecycle::State & /*previous_state*/)
 {
- RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Activating Servo Mode...");
 
-  // 再次同步位置，确保安全
-  robot_.get_joint_position(&joint_position_fb_);
-  for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
-     hw_states_[i] = joint_position_fb_.jVal[i];
-     hw_commands_[i] = hw_states_[i];
-  }
-
-  // 开启 Servo 模式 (实时控制模式)
-  if (robot_.servo_move_enable(true) != ERR_SUCC) {
-    RCLCPP_ERROR(rclcpp::get_logger("JakaHardwareInterface"), "Failed to enable servo mode");
-    return CallbackReturn::ERROR;
-  }
+  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Activating... (Ensuring EDG is running)");
   
-  // 等待伺服模式稳定
-  std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  // 可以在这里再次确保 EDG 开启，或者重置状态
+  // 再次同步，因为从 Configure 到 Activate 可能有时间差
+  robot_.edg_get_stat(&edg_state_);
+  for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
+      hw_position_commands_[i] = edg_state_.jointVal.jVal[i];
+  }
 
-  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "System Activated");
   return CallbackReturn::SUCCESS;
 }
 
@@ -160,14 +213,11 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_deactivate(
 {
   // TODO(anyone): prepare the robot to stop receiving commands
 
-  // errno_t ret = robot_.servo_move_enable(FALSE);
-  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Deactivating Servo Mode...");
-
-  // 关闭 Servo 模式
-  robot_.servo_move_enable(false);
-  // robot_.disable_robot();
-  // robot_.power_off();
-
+  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Deactivating... Stopping EDG");
+  
+  // 关闭 EDG 模式
+  robot_.edg_init(false);
+  
 
   return CallbackReturn::SUCCESS;
 }
@@ -179,20 +229,31 @@ hardware_interface::return_type JakaHardwareInterface::read(
   //printf("get joint value!\n");
 
 
+// 使用 EDG 接口读取全量数据
+  errno_t ret = robot_.edg_get_stat(&edg_state_);
 
-  if (robot_.get_joint_position(&joint_position_fb_) == ERR_SUCC) {
+  if (ret == ERR_SUCC) 
+  {
     for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
-      hw_states_[i] = joint_position_fb_.jVal[i];
+      hw_position_states_[i] = edg_state_.jointVal.jVal[i];
+      hw_velocity_states_[i] = edg_state_.jointVel.jVel[i];
+      hw_effort_states_[i]   = edg_state_.jointTorq.jtorq[i];
+    }
+    // 2. === 新增：更新力传感器数据 ===
+    if (hw_fts_states_.size() == 6) {
+
+        hw_fts_states_[0] = edg_state_.torqSensor.fx;  // Force X
+        hw_fts_states_[1] = edg_state_.torqSensor.fy;  // Force Y
+        hw_fts_states_[2] = edg_state_.torqSensor.fz;  // Force Z
+        hw_fts_states_[3] = edg_state_.torqSensor.tx; // Torque X
+        hw_fts_states_[4] = edg_state_.torqSensor.ty; // Torque Y
+        hw_fts_states_[5] = edg_state_.torqSensor.tz; // Torque Z
     }
   } else {
-    // 读取失败处理，通常打印 Warning 并保持旧值
-    // RCLCPP_WARN_THROTTLE(rclcpp::get_logger("JakaHardwareInterface"), *this->get_clock(), 1000, "Failed to read joint state");
+    // 读取失败时，不要更新状态，保持上一次的值，避免控制器发散
+    // 可以添加限流日志
+    // RCLCPP_WARN(rclcpp::get_logger("JakaHardwareInterface"), "EDG Read Failed: %d", ret);
   }
-
-  // for (size_t i = 0; i < hw_commands_.size(); ++i) {
-  //   printf("j%zu:%.2f\t", i + 1, hw_states_[i]);
-  // }
-  // printf("\n");
 
 
   return hardware_interface::return_type::OK;
@@ -202,31 +263,25 @@ hardware_interface::return_type JakaHardwareInterface::write(
   const rclcpp::Time & , const rclcpp::Duration & /*period*/)
 {
 
-  // for (size_t i = 0; i < hw_commands_.size(); ++i) {
-  //   printf("j%zu:%.10f\t", i + 1, hw_commands_[i]);
-  // }
-  // printf("\n");
-
-   // 将 ROS 的 Command 填入 SDK 的结构体
+  // 准备指令数据
   for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
-    // 安全检查：如果命令是 NaN，则不发送（或保持当前位置）
-    if (std::isnan(hw_commands_[i])) {
-        joint_position_cmd_.jVal[i] = hw_states_[i];
+    // NaN 检查
+    if (std::isnan(hw_position_commands_[i])) {
+        joint_cmd_.jVal[i] = hw_position_states_[i];
     } else {
-        joint_position_cmd_.jVal[i] = hw_commands_[i];
+        joint_cmd_.jVal[i] = hw_position_commands_[i];
     }
   }
 
-  // 发送伺服控制指令
-  // servo_j: 关节空间伺服运动
-  // ABS: 绝对位置模式 (Increment 为相对模式)
-  // step_num: 1 (倍周期，通常填1)
-  errno_t ret = robot_.servo_j(&joint_position_cmd_, MoveMode::ABS, 1);
+  // 使用 EDG 伺服接口发送指令
+  // MoveMode::ABS (绝对位置)
+  // step_num = 1 (通常设为1，表示立即执行)
+  
+  // errno_t ret = robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
 
-  if (ret != ERR_SUCC) {
-    // 写入失败通常意味着网络抖动或指令不平滑（速度/加速度超限）
-    // 可以在这里做错误计数
-  }
+  // if (ret != ERR_SUCC) {
+  //    // 写入失败处理
+  // }
 
   return hardware_interface::return_type::OK;
 }
