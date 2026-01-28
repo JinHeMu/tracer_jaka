@@ -58,7 +58,6 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_init(
   // 3. 初始化存储向量
   hw_position_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_velocity_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_effort_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_fts_states_.resize(6, std::numeric_limits<double>::quiet_NaN());
   
   hw_position_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -120,7 +119,6 @@ RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Connecting to robot...
   for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
     hw_position_states_[i] = edg_state_.jointVal.jVal[i];
     hw_velocity_states_[i] = edg_state_.jointVel.jVel[i]; // rad/s
-    hw_effort_states_[i]   = edg_state_.jointTorq.jtorq[i]; // N.m
     
     hw_position_commands_[i] = hw_position_states_[i]; // 初始指令 = 当前位置
     
@@ -146,9 +144,6 @@ std::vector<hardware_interface::StateInterface> JakaHardwareInterface::export_st
     state_interfaces.emplace_back(hardware_interface::StateInterface(
       info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_states_[i]));
 
-    // 导出 Effort (你的 XML 中有定义)
-    state_interfaces.emplace_back(hardware_interface::StateInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
   }
 
   if (info_.sensors.size() > 0) {
@@ -239,7 +234,6 @@ hardware_interface::return_type JakaHardwareInterface::read(
     for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
       hw_position_states_[i] = edg_state_.jointVal.jVal[i];
       hw_velocity_states_[i] = edg_state_.jointVel.jVel[i];
-      hw_effort_states_[i]   = edg_state_.jointTorq.jtorq[i];
     }
     // 2. === 新增：更新力传感器数据 ===
     if (hw_fts_states_.size() == 6) {
@@ -282,11 +276,23 @@ hardware_interface::return_type JakaHardwareInterface::write(
   // MoveMode::ABS (绝对位置)
   // step_num = 1 (通常设为1，表示立即执行)
   
-  errno_t ret = robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
+  static std::array<double,6> last_sent{};
+  static bool inited=false;
 
-  if (ret != ERR_SUCC) {
-     // 写入失败处理
+  double eps = 1e-4; // 约0.0001 rad ≈ 0.0057°
+  bool changed=false;
+  for (int i=0;i<6;i++){
+    if (!inited || std::fabs(joint_cmd_.jVal[i]-last_sent[i])>eps) { changed=true; }
   }
+
+  if (changed) {
+    robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
+    for (int i=0;i<6;i++) last_sent[i]=joint_cmd_.jVal[i];
+    inited=true;
+  } else {
+    // 不发 or 降频发（比如每 10 个周期发一次）
+  }
+
 
   return hardware_interface::return_type::OK;
 }

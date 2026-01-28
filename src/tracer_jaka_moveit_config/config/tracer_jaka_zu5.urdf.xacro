@@ -9,6 +9,6 @@
     <xacro:include filename="tracer_jaka_zu5.ros2_control.xacro" />
 
 
-    <xacro:tracer_jaka_zu5_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)"/>
+    <xacro:tracer_jaka_zu5_ros2_control name="RealSystem" initial_positions_file="$(arg initial_positions_file)"/>
 
 </robot>

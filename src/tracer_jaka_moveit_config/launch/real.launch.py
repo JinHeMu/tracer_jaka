@@ -160,11 +160,12 @@ def generate_launch_description():
         declare_db,
 
         robot_state_publisher,
+        move_group_node,
+        rviz_node,
+
 
         ros2_control_node,
         joint_state_broadcaster_spawner,
         jaka_arm_controller_spawner,
-        jaka_fts_broadcaster_spawner,   
-        move_group_node,
-        rviz_node,
+        jaka_fts_broadcaster_spawner, 
     ])

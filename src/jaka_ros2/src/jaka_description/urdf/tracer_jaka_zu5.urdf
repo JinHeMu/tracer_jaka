@@ -1490,7 +1490,7 @@
   <joint name="base_to_jaka" type="fixed">
     <parent link="base_link"/>
     <child link="jaka_base_link"/>
-    <origin rpy="0 0 0" xyz="0 0 0.218"/>
+    <origin rpy="-0.02 0 0" xyz="0 0 0.221"/>
   </joint>
   <joint name="base_footprint_to_trace" type="fixed">
     <parent link="base_link"/>

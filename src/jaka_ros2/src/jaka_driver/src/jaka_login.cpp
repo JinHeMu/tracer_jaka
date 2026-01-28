@@ -22,7 +22,8 @@ int main(void)
     std::this_thread::sleep_for(std::chrono::seconds(4));
     //Joint-space first-order low-pass filtering in robot servo mode
     //robot.servo_move_use_joint_LPF(2);
-    robot.servo_move_use_joint_NLF(90,90,180);
+    robot.set_torque_sensor_mode(1);  
+    robot.servo_move_use_joint_NLF(45,45,90);
     std::cout << "you can start jaka" << std::endl;
     return 0;
 }
