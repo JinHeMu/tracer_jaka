@@ -13,6 +13,11 @@ controller_manager:
     jaka_fts_broadcaster:
       type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
 
+    jaka_admittance_controller:
+      type: admittance_controller/AdmittanceController
+
+
+
 jaka_arm_controller:
   ros__parameters:
     joints:
@@ -34,107 +39,102 @@ jaka_fts_broadcaster:
     frame_id: "jk_se_vi_200_link"
 
 
-# jaka_admittance_controller:
-#   ros__parameters:
-#     joints:
-#       - joint_1
-#       - joint_2
-#       - joint_3
-#       - joint_4
-#       - joint_5
-#       - joint_6
+jaka_admittance_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
 
-#     # 1. 接口配置
-#     command_interfaces:
-#       - position  # 输出给硬件的指令
+    # 1. 接口配置
+    command_interfaces:
+      - position  # 输出给硬件的指令
     
-#     state_interfaces:
-#       - position
-#       - velocity
+    state_interfaces:
+      - position
+      - velocity
 
-#     chainable_command_interfaces:
-#       - position
-#       - velocity
+    chainable_command_interfaces:
+      - position
+      - velocity
 
-#     # 2. 运动学插件配置 (必须安装 ros-humble-kinematics-interface-kdl)
-#     kinematics:
-#       plugin_name: kinematics_interface_kdl/KinematicsInterfaceKDL
-#       plugin_package: kinematics_interface_kdl
-#       base: base_link             # 机械臂基座
-#       tip: gripper_center_link    # 【重要】运动学链的末端，通常与控制帧一致
-#       alpha: 0.0005               # 逆解阻尼系数
+    # 2. 运动学插件配置 (必须安装 ros-humble-kinematics-interface-kdl)
+    kinematics:
+      plugin_name: kinematics_interface_kdl/KinematicsInterfaceKDL
+      plugin_package: kinematics_interface
+      base: base_link             # 机械臂基座
+      group_name: jaka_arm
+      tip: gripper_center_link    # 【重要】运动学链的末端，通常与控制帧一致
+      alpha: 0.0005               # 逆解阻尼系数
 
-#     # 3. 力传感器配置 (数据来源)
-#     ft_sensor:
-#       name: tcp_fts_sensor        # 必须与 URDF 中的 <sensor name="..."> 一致
-#       frame:
-#         id: jk_se_vi_200_link     # 【重要】传感器坐标系
-#         external: false           # false 表示该 link 在 URDF 树中存在
-#       filter_coefficient: 0.005   # 低通滤波系数，值越小越平滑但延迟越高
+    # 3. 力传感器配置 (数据来源)
+    ft_sensor:
+      name: tcp_fts_sensor        # 必须与 URDF 中的 <sensor name="..."> 一致
+      frame:
+        id: jk_se_vi_200_link     # 【重要】传感器坐标系
+        external: false           # false 表示该 link 在 URDF 树中存在
+      filter_coefficient: 0.5   # 低通滤波系数，值越小越平滑但延迟越高
 
-#     # 4. 控制帧配置 (控制目标)
-#     control:
-#       frame:
-#         id: gripper_center_link   # 【重要】导纳计算的参考系 (TCP)
-#         external: false
+    # 4. 控制帧配置 (控制目标)
+    control:
+      frame:
+        id: gripper_center_link   # 【重要】导纳计算的参考系 (TCP)
+        external: false
 
-#     # 5. 固定世界坐标系 (用于重力方向参考)
-#     fixed_world_frame:
-#       frame:
-#         id: base_link             # 重力在这个坐标系下通常是 -Z 方向
-#         external: false
+    # 5. 固定世界坐标系 (用于重力方向参考)
+    fixed_world_frame:
+      frame:
+        id: base_link             # 重力在这个坐标系下通常是 -Z 方向
+        external: false
 
-#     # 6. 重力补偿配置 (除去工具重量)
-#     gravity_compensation:
-#       frame:
-#         id: jk_se_vi_200_link     # 【重要】负载通常是固定在传感器上的
-#         external: false
-#       CoG: 
-#         pos:
-#           - -0.006684  # 重心 X (相对于传感器坐标系)
-#           - -0.005518  # 重心 Y
-#           - 0.063504 # 重心 Z (假设工具重心在传感器前方 5cm)
-#         force: 12.76 # 工具重量 = 质量(kg) * 9.81 (例如 1.5kg * 9.8 = 14.7)
+    gravity_compensation:
+      frame:
+        id: gripper_center_link
+        external: false
 
-#     # 7. 导纳参数 (M, D, K)
-#     admittance:
-#       selected_axes:
-#         - true # x
-#         - true # y
-#         - true # z
-#         - true # rx
-#         - true # ry
-#         - true # rz
+      CoG: # specifies the center of gravity of the end effector
+        pos:
+          - 0.0 # x
+          - 0.0 # y
+          - 0.0 # z
+        force: 0.0 # mass * 9.81
 
-#       # 质量 (Mass) - 虚拟惯性 (值越小，反应越快，太小会震荡)
-#       # Having ".0" at the end is MUST, otherwise there is a loading error
-#       # F = M*a + D*v + S*(x - x_d)
-#       mass:
-#         - 5.5
-#         - 6.6
-#         - 7.7
-#         - 8.8
-#         - 9.9
-#         - 10.10
+    # 7. 导纳参数 (M, D, K)
+    admittance:
+      selected_axes:
+        - true # x
+        - true # y
+        - true # z
+        - true # rx
+        - true # ry
+        - true # rz
 
+      # 质量 (Mass) - 虚拟惯性 (值越小，反应越快，太小会震荡)
+      # Having ".0" at the end is MUST, otherwise there is a loading error
+      # F = M*a + D*v + S*(x - x_d)
+      mass:
+        - 5.5
+        - 6.6
+        - 7.7
+        - 8.8
+        - 9.9
+        - 10.10
 
-#       # 阻尼 (Damping) - 决定拖拽的“粘滞感” (值越大越重)
-#       # 建议使用 damping_ratio (阻尼比) 更容易调参，通常设为临界阻尼附近 (0.7 ~ 4.0)
-#       damping_ratio:
-#         - 2.0 # x
-#         - 2.0 # y
-#         - 2.0 # z
-#         - 2.0 # rx
-#         - 2.0 # ry
-#         - 2.0 # rz
+      damping_ratio: # damping can be used instead: zeta = D / (2 * sqrt( M * S ))
+        - 2.828427 # x
+        - 2.828427 # y
+        - 2.828427 # z
+        - 2.828427 # rx
+        - 2.828427 # ry
+        - 2.828427 # rz
 
-#       # 刚度 (Stiffness)
-#       # 0.0 = 拖拽模式 (无回弹)
-#       # >0  = 恒力模式 (像弹簧一样回弹)
-#       stiffness:
-#         - 0.0
-#         - 0.0
-#         - 0.0
-#         - 0.0
-#         - 0.0
-#         - 0.0
+      stiffness:
+        - 214.1
+        - 214.2
+        - 214.3
+        - 214.4
+        - 214.5
+        - 214.6

@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <cmath>
 
 #include "hardware_interface/system_interface.hpp"
 #include "hardware_interface/handle.hpp"
@@ -29,6 +30,8 @@
 // JAKA SDK Headers
 #include "jaka_driver/JAKAZuRobot.h"
 #include "jaka_driver/jktypes.h"
+
+#include "jaka_hardware_interface/ft_compensator.hpp" // 新增
 
 namespace jaka_hardware_interface
 {
@@ -79,6 +82,27 @@ private:
 
   // Commands (Position only as per URDF)
   std::vector<double> hw_position_commands_;
+
+  FTCompensator ft_compensator_; 
+  
+  // 建议增加一个变量存储原始（未补偿）数据，用于调试
+  std::vector<double> hw_fts_raw_;
+  std::vector<double> ft_bias_;      // 存储零点偏移量
+  bool bias_initialized_ = false;    // 标记是否已经完成了零点校准
+
+
+private:
+    // 滤波系数 (0.0 ~ 1.0)
+    double filter_alpha_ = 0.5; 
+    
+    // 简单的低通滤波函数
+    inline double low_pass_filter(double current_raw, double prev_filtered) {
+        // 如果上次的值是 NaN (刚启动)，则直接使用当前值，避免计算错误
+        if (std::isnan(prev_filtered)) {
+            return current_raw;
+        }
+        return filter_alpha_ * current_raw + (1.0 - filter_alpha_) * prev_filtered;
+    }
 
 };
 

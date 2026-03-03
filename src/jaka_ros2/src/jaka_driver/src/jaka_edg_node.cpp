@@ -13,6 +13,8 @@
 #include <thread>
 #include <atomic>
 
+#include <fstream> // [新增] 文件流头文件
+
 class JakaEdgNode : public rclcpp::Node
 {
 public:
@@ -22,6 +24,10 @@ public:
         this->declare_parameter<std::string>("robot_ip", "10.5.5.100");
         this->declare_parameter<std::string>("local_ip", "10.5.5.127");
         
+        // [新增] 声明采集开关和文件名参数
+        this->declare_parameter<bool>("record_data", true);
+        this->declare_parameter<std::string>("csv_path", "gravity_data.csv");
+
         // 2. 初始化 SDK 对象
         robot_ = std::make_shared<JAKAZuRobot>();
 
@@ -32,9 +38,24 @@ public:
         // 4. 启动一个独立线程进行机器人连接和初始化，防止阻塞 ROS 主线程
         init_thread_ = std::thread(&JakaEdgNode::init_robot_sequence, this);
 
-        // 5. 创建定时器 (20ms)
+                // [新增] 打开 CSV 文件并写入表头
+        bool record = this->get_parameter("record_data").as_bool();
+        if (record) {
+            std::string path = this->get_parameter("csv_path").as_string();
+            csv_file_.open(path, std::ios::out | std::ios::trunc);
+            if (csv_file_.is_open()) {
+                // 写入表头：6个关节角 + 6个力/力矩
+                csv_file_ << "joint0,joint1,joint2,joint3,joint4,joint5,"
+                          << "fx,fy,fz,tx,ty,tz\n";
+                RCLCPP_INFO(this->get_logger(), "数据记录已开启，文件路径: %s", path.c_str());
+            } else {
+                RCLCPP_ERROR(this->get_logger(), "无法打开文件: %s", path.c_str());
+            }
+        }
+
+        // 5. 创建定时器 (100ms)
         timer_ = this->create_wall_timer(
-            std::chrono::milliseconds(20), 
+            std::chrono::milliseconds(100), 
             std::bind(&JakaEdgNode::timer_callback, this));
             
         RCLCPP_INFO(this->get_logger(), "节点已启动，正在后台连接机器人...");
@@ -50,6 +71,12 @@ public:
             RCLCPP_INFO(this->get_logger(), "正在关闭 EDG 并断开连接...");
             robot_->edg_init(false); // 关闭 EDG
             robot_->login_out();
+        }
+
+                // [新增] 关闭文件
+        if (csv_file_.is_open()) {
+            csv_file_.close();
+            RCLCPP_INFO(this->get_logger(), "数据采集结束，文件已保存。");
         }
     }
 
@@ -132,11 +159,33 @@ private:
                 "EDG 数据正常: J1: %.2f, X: %.2f, Y: %.2f, Z: %.2f", 
                 joint_msg.position[0], pose_msg.pose.position.x, pose_msg.pose.position.y, pose_msg.pose.position.z);
 
-        } else {
+                // --- 2. [新增] 核心采集逻辑：写入 CSV ---
+            if (csv_file_.is_open()) {
+                // 写入 6 个关节角 (弧度)
+                for (int i = 0; i < 6; i++) {
+                    csv_file_ << state.jointVal.jVal[i] << ",";
+                }
+
+                // 写入 6 维力传感器数据
+                // 注意：请在 jktypes.h 中确认字段名，通常是 torqSensor 或 extSensor
+                // 假设单位：力是 N，力矩是 Nm
+                csv_file_ << state.torqSensor.fx << ","
+                            << state.torqSensor.fy << ","
+                            << state.torqSensor.fz << ","
+                            << state.torqSensor.tx << ","
+                            << state.torqSensor.ty << ","
+                            << state.torqSensor.tz << "\n"; // 换行
+            }
+
+        }
+        
+         else {
             // 出错时也限制打印频率
             RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 1000, 
                 "获取 EDG 数据失败 (Ret: %d). 请检查防火墙是否允许 UDP 端口 10000-10010.", ret);
         }
+
+        
     }
 
     std::shared_ptr<JAKAZuRobot> robot_;
@@ -146,6 +195,7 @@ private:
     
     std::thread init_thread_;   // 用于后台初始化
     std::atomic<bool> is_connected_; // 线程安全的标志位
+    std::ofstream csv_file_;
 };
 
 int main(int argc, char * argv[])

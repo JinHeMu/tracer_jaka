@@ -4,7 +4,8 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-
+from launch.actions import RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 from ament_index_python.packages import get_package_share_directory
 from moveit_configs_utils import MoveItConfigsBuilder
 from launch.conditions import IfCondition
@@ -108,6 +109,17 @@ def generate_launch_description():
         output="screen",
     )
 
+    jaka_admittance_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "jaka_admittance_controller",
+            "--controller-manager",
+            "/controller_manager",
+        ],
+        output="screen",
+    )
+
     jaka_fts_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -117,6 +129,15 @@ def generate_launch_description():
             "/controller_manager",
         ],
         output="screen",
+    )
+
+    #关键步骤：创建事件处理器
+    # 当 admittance_spawner 进程退出时（spawner 成功发完指令就会退出），再启动 jtc_spawner
+    delay_jtc_after_admittance = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=jaka_admittance_controller_spawner,
+            on_exit=[jaka_arm_controller_spawner],
+        )
     )
     # -------------------------------
     # Move group (MoveIt core)
@@ -166,6 +187,8 @@ def generate_launch_description():
 
         ros2_control_node,
         joint_state_broadcaster_spawner,
-        jaka_arm_controller_spawner,
+        
         jaka_fts_broadcaster_spawner, 
+        jaka_admittance_controller_spawner,
+        delay_jtc_after_admittance,
     ])

@@ -58,9 +58,14 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_init(
   // 3. 初始化存储向量
   hw_position_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_velocity_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_fts_states_.resize(6, std::numeric_limits<double>::quiet_NaN());
-  
   hw_position_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  
+  // === 修改：FTS 相关初始化 ===
+  hw_fts_states_.resize(6, 0.0);    // 输出给ROS的数据 (初始为0)
+  hw_fts_raw_.resize(6, 0.0);       // 原始数据容器
+  ft_bias_.resize(6, 0.0);          // 偏置容器
+  bias_initialized_ = false;        // 重置标志位
+  
 
   RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), 
     "Jaka EDG Interface Init: Robot=%s, Local=%s", robot_ip_.c_str(), local_ip_.c_str());
@@ -193,6 +198,13 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_activate(
 
   RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), "Activating... (Ensuring EDG is running)");
   robot_.servo_move_enable(true);
+
+  // 建议：每次 Activate 都重新校准一次零点
+  // 这样如果之前校准歪了，重启一下 Controller 就好了
+  bias_initialized_ = false; 
+  std::fill(hw_fts_states_.begin(), hw_fts_states_.end(), 0.0);
+
+
   // 可以在这里再次确保 EDG 开启，或者重置状态
   // 再次同步，因为从 Configure 到 Activate 可能有时间差
   robot_.edg_get_stat(&edg_state_);
@@ -222,35 +234,86 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_deactivate(
 hardware_interface::return_type JakaHardwareInterface::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-  // TODO(anyone): read robot states
-  //printf("get joint value!\n");
-
-
-// 使用 EDG 接口读取全量数据
+ // 1. 使用 EDG 接口读取全量数据
   errno_t ret = robot_.edg_get_stat(&edg_state_);
 
   if (ret == ERR_SUCC) 
   {
+    // A. 更新关节状态
+    std::vector<double> current_joints(6); // 临时存关节角给神经网络用
     for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
       hw_position_states_[i] = edg_state_.jointVal.jVal[i];
       hw_velocity_states_[i] = edg_state_.jointVel.jVel[i];
+      
+      current_joints[i] = hw_position_states_[i]; // 拷贝关节角
     }
-    // 2. === 新增：更新力传感器数据 ===
+
+    // hw_fts_states_[0] = edg_state_.torqSensor.fx;
+    // hw_fts_states_[1] = edg_state_.torqSensor.fy;
+    // hw_fts_states_[2] = edg_state_.torqSensor.fz;
+
+    // hw_fts_states_[3] = edg_state_.torqSensor.tx;
+    // hw_fts_states_[4] = edg_state_.torqSensor.ty;
+    // hw_fts_states_[5] = edg_state_.torqSensor.tz;
+
+
+
+    // B. 更新力传感器数据 (带重力补偿 + 自动零偏去除)
     if (hw_fts_states_.size() == 6) {
+        
+        // --- 1. 获取原始数据 ---
+        hw_fts_raw_[0] = edg_state_.torqSensor.fx;
+        hw_fts_raw_[1] = edg_state_.torqSensor.fy;
+        hw_fts_raw_[2] = edg_state_.torqSensor.fz;
+        hw_fts_raw_[3] = edg_state_.torqSensor.tx;
+        hw_fts_raw_[4] = edg_state_.torqSensor.ty;
+        hw_fts_raw_[5] = edg_state_.torqSensor.tz;
 
-        hw_fts_states_[0] = edg_state_.torqSensor.fx;  // Force X
-        hw_fts_states_[1] = edg_state_.torqSensor.fy;  // Force Y
-        hw_fts_states_[2] = edg_state_.torqSensor.fz;  // Force Z
-        hw_fts_states_[3] = edg_state_.torqSensor.tx; // Torque X
-        hw_fts_states_[4] = edg_state_.torqSensor.ty; // Torque Y
-        hw_fts_states_[5] = edg_state_.torqSensor.tz; // Torque Z
-    }
+        // // --- 2. 神经网络预测重力 ---
+        // // 输入当前关节角，得到理论重力值
+        // std::vector<double> gravity_pred = ft_compensator_.predict(current_joints);
+
+        // --- 3. 自动零点校准 (Auto Tare) ---
+        // 仅在未初始化且数据有效时执行一次
+        if (!bias_initialized_) {
+            // 简单检查：确保不是全0数据（防止连接没建立时校准）
+            bool is_valid_data = false;
+            for(double v : hw_fts_raw_) { if(std::abs(v) > 1e-3) is_valid_data = true; }
+
+            if (is_valid_data) {
+                for (int i = 0; i < 6; ++i) {
+                    // Bias = Raw - Pred
+                    // 含义：此时应该是0力，所以多出来的部分就是 Bias
+                    ft_bias_[i] = hw_fts_raw_[i];
+                }
+                bias_initialized_ = true;
+            }
+        }
+
+        // --- 4. 计算最终接触力 ---
+        if (bias_initialized_) {
+            for (int i = 0; i < 6; ++i) {
+                // 公式：Contact = Raw - Gravity - Bias
+                double pure_force = hw_fts_raw_[i] - ft_bias_[i];
+
+                // hw_fts_states_[i] = hw_fts_raw_[i] - gravity_pred[i];
+                // // (可选) 死区处理：去除微小噪音
+                if (std::abs(pure_force) < 3) pure_force = 0.0;
+
+                // // (可选) 低通滤波: Y_new = alpha * X + (1-alpha) * Y_old
+                hw_fts_states_[i] = filter_alpha_ * pure_force + (1.0 - filter_alpha_) * hw_fts_states_[i];
+            }
+        } else {
+            // 未校准前，暂时输出原始值或0，防止飞车
+            // 这里选择输出0比较安全
+            hw_fts_states_[0] = 0.0; 
+            // ...
+        }
+      }
+  
   } else {
-    // 读取失败时，不要更新状态，保持上一次的值，避免控制器发散
-    // 可以添加限流日志
-    // RCLCPP_WARN(rclcpp::get_logger("JakaHardwareInterface"), "EDG Read Failed: %d", ret);
+    // 读取失败处理
   }
-
 
   return hardware_interface::return_type::OK;
 }
@@ -279,7 +342,7 @@ hardware_interface::return_type JakaHardwareInterface::write(
   static std::array<double,6> last_sent{};
   static bool inited=false;
 
-  double eps = 1e-4; // 约0.0001 rad ≈ 0.0057°
+  double eps = 1e-5; // 约0.0001 rad ≈ 0.0057°
   bool changed=false;
   for (int i=0;i<6;i++){
     if (!inited || std::fabs(joint_cmd_.jVal[i]-last_sent[i])>eps) { changed=true; }
@@ -287,6 +350,9 @@ hardware_interface::return_type JakaHardwareInterface::write(
 
   if (changed) {
     robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
+    // printf("write joint value: %f, %f, %f, %f, %f, %f\n", 
+    //   joint_cmd_.jVal[0], joint_cmd_.jVal[1], joint_cmd_.jVal[2], 
+    //   joint_cmd_.jVal[3], joint_cmd_.jVal[4], joint_cmd_.jVal[5]);
     for (int i=0;i<6;i++) last_sent[i]=joint_cmd_.jVal[i];
     inited=true;
   } else {
@@ -305,4 +371,3 @@ hardware_interface::return_type JakaHardwareInterface::write(
 
 PLUGINLIB_EXPORT_CLASS(
   jaka_hardware_interface::JakaHardwareInterface, hardware_interface::SystemInterface)
-
