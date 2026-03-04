@@ -25,7 +25,8 @@ int main(void)
     
     robot.set_torque_sensor_mode(1); 
       
-    robot.servo_move_use_joint_NLF(45,45,90);
+    robot.servo_move_use_joint_NLF(45,30,30);
+    //robot.servo_move_use_joint_NLF(45,45,45);
     std::cout << "you can start jaka" << std::endl;
     return 0;
 }
