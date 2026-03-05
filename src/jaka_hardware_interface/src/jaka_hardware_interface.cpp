@@ -298,7 +298,15 @@ hardware_interface::return_type JakaHardwareInterface::read(
 
                 // hw_fts_states_[i] = hw_fts_raw_[i] - gravity_pred[i];
                 // // (可选) 死区处理：去除微小噪音
-                if (std::abs(pure_force) < 3) pure_force = 0.0;
+                if (i < 3)
+                {
+                  if (std::abs(pure_force) < 3) pure_force = 0.0;
+                }else
+                {
+                  if (std::abs(pure_force) < 0.5) pure_force = 0.0;
+                }
+                
+                
 
                 // // (可选) 低通滤波: Y_new = alpha * X + (1-alpha) * Y_old
                 hw_fts_states_[i] = filter_alpha_ * pure_force + (1.0 - filter_alpha_) * hw_fts_states_[i];

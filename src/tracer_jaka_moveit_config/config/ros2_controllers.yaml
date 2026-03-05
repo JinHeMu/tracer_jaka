@@ -3,10 +3,10 @@ controller_manager:
   ros__parameters:
     update_rate: 125  # Hz
 
-    # jaka_arm_controller:
-    #   type: forward_command_controller/ForwardCommandController
     jaka_arm_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
+      type: forward_command_controller/ForwardCommandController
+    # jaka_arm_controller:
+    #   type: joint_trajectory_controller/JointTrajectoryController
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -19,33 +19,33 @@ controller_manager:
 
 
 
-# jaka_arm_controller:
-#   ros__parameters:
-#     joints:
-#       - jaka_admittance_controller/joint_1
-#       - jaka_admittance_controller/joint_2
-#       - jaka_admittance_controller/joint_3
-#       - jaka_admittance_controller/joint_4
-#       - jaka_admittance_controller/joint_5
-#       - jaka_admittance_controller/joint_6
-#     interface_name: position
-
 jaka_arm_controller:
   ros__parameters:
     joints:
-      - joint_1
-      - joint_2
-      - joint_3
-      - joint_4
-      - joint_5
-      - joint_6
-        # 1. 接口配置
-    command_interfaces:
-      - position  # 输出给硬件的指令
+      - jaka_admittance_controller/joint_1
+      - jaka_admittance_controller/joint_2
+      - jaka_admittance_controller/joint_3
+      - jaka_admittance_controller/joint_4
+      - jaka_admittance_controller/joint_5
+      - jaka_admittance_controller/joint_6
+    interface_name: position
+
+# jaka_arm_controller:
+#   ros__parameters:
+#     joints:
+#       - joint_1
+#       - joint_2
+#       - joint_3
+#       - joint_4
+#       - joint_5
+#       - joint_6
+#         # 1. 接口配置
+#     command_interfaces:
+#       - position  # 输出给硬件的指令
     
-    state_interfaces:
-      - position
-      - velocity
+#     state_interfaces:
+#       - position
+#       - velocity
 
 
 jaka_fts_broadcaster:
@@ -123,33 +123,50 @@ jaka_admittance_controller:
         - true # x
         - true # y
         - true # z
-        - true # rx
-        - true # ry
-        - true # rz
+        - false # rx
+        - false # ry
+        - false # rz
 
       # 质量 (Mass) - 虚拟惯性 (值越小，反应越快，太小会震荡)
       # Having ".0" at the end is MUST, otherwise there is a loading error
       # F = M*a + D*v + S*(x - x_d)
       mass:
-        - 5.5
+        - 10.0
+        - 10.0
         - 6.6
-        - 7.7
-        - 8.8
-        - 9.9
-        - 10.10
+        - 1.1
+        - 1.1
+        - 1.1
 
       damping_ratio: # damping can be used instead: zeta = D / (2 * sqrt( M * S ))
         - 2.828427 # x
         - 2.828427 # y
-        - 2.828427 # z
-        - 2.828427 # rx
-        - 2.828427 # ry
-        - 2.828427 # rz
+        - 10.0 # z
+        - 0.5 # rx
+        - 0.5 # ry
+        - 0.5 # rz
 
       stiffness:
-        - 214.1
-        - 214.2
-        - 214.3
-        - 214.4
-        - 214.5
-        - 214.6
+        - 200.0
+        - 200.0
+        - 200.0
+        - 0.0
+        - 0.0
+        - 0.0
+
+      target_wrench:
+        - 0.0
+        - 0.0
+        - 5.0
+        - 0.0
+        - 0.0
+        - 0.0
+
+      force_control_axes:
+        - false  # x  → 导纳柔顺
+        - false  # y  → 导纳柔顺
+        - true   # z  → 恒力控制
+        - false  # rx → 导纳柔顺
+        - false  # ry → 导纳柔顺
+        - false  # rz → 导纳柔顺
+

@@ -189,7 +189,7 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         
         jaka_fts_broadcaster_spawner, 
-        #jaka_admittance_controller_spawner,
-        #delay_jtc_after_admittance,
-        jaka_arm_controller_spawner,
+        jaka_admittance_controller_spawner,
+        delay_jtc_after_admittance,
+        #jaka_arm_controller_spawner,
     ])
