@@ -1,0 +1,172 @@
+# This config file is used by ros2_control
+controller_manager:
+  ros__parameters:
+    update_rate: 125  # Hz
+
+    jaka_arm_controller:
+      type: forward_command_controller/ForwardCommandController
+    # jaka_arm_controller:
+    #   type: joint_trajectory_controller/JointTrajectoryController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    jaka_fts_broadcaster:
+      type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
+
+    jaka_admittance_controller:
+      type: admittance_controller/AdmittanceController
+
+
+
+jaka_arm_controller:
+  ros__parameters:
+    joints:
+      - jaka_admittance_controller/joint_1
+      - jaka_admittance_controller/joint_2
+      - jaka_admittance_controller/joint_3
+      - jaka_admittance_controller/joint_4
+      - jaka_admittance_controller/joint_5
+      - jaka_admittance_controller/joint_6
+    interface_name: position
+
+# jaka_arm_controller:
+#   ros__parameters:
+#     joints:
+#       - joint_1
+#       - joint_2
+#       - joint_3
+#       - joint_4
+#       - joint_5
+#       - joint_6
+#         # 1. 接口配置
+#     command_interfaces:
+#       - position  # 输出给硬件的指令
+    
+#     state_interfaces:
+#       - position
+#       - velocity
+
+
+jaka_fts_broadcaster:
+  ros__parameters:
+    sensor_name: "tcp_fts_sensor"
+    frame_id: "jk_se_vi_200_link"
+
+
+jaka_admittance_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+
+    # 1. 接口配置
+    command_interfaces:
+      - position  # 输出给硬件的指令
+    
+    state_interfaces:
+      - position
+      - velocity
+
+    chainable_command_interfaces:
+      - position
+      - velocity
+
+    # 2. 运动学插件配置 (必须安装 ros-humble-kinematics-interface-kdl)
+    kinematics:
+      plugin_name: kinematics_interface_kdl/KinematicsInterfaceKDL
+      plugin_package: kinematics_interface
+      base: base_link             # 机械臂基座
+      group_name: jaka_arm
+      tip: gripper_center_link    # 【重要】运动学链的末端，通常与控制帧一致
+      alpha: 0.0005               # 逆解阻尼系数
+
+    # 3. 力传感器配置 (数据来源)
+    ft_sensor:
+      name: tcp_fts_sensor        # 必须与 URDF 中的 <sensor name="..."> 一致
+      frame:
+        id: jk_se_vi_200_link     # 【重要】传感器坐标系
+        external: false           # false 表示该 link 在 URDF 树中存在
+      filter_coefficient: 0.5   # 低通滤波系数，值越小越平滑但延迟越高
+
+    # 4. 控制帧配置 (控制目标)
+    control:
+      frame:
+        id: gripper_center_link   # 【重要】导纳计算的参考系 (TCP)
+        external: false
+
+    # 5. 固定世界坐标系 (用于重力方向参考)
+    fixed_world_frame:
+      frame:
+        id: base_link             # 重力在这个坐标系下通常是 -Z 方向
+        external: false
+
+    gravity_compensation:
+      frame:
+        id: gripper_center_link
+        external: false
+
+      CoG: # specifies the center of gravity of the end effector
+        pos:
+          - 0.0 # x
+          - 0.0 # y
+          - 0.0 # z
+        force: 0.0 # mass * 9.81
+
+    # 7. 导纳参数 (M, D, K)
+    admittance:
+      selected_axes:
+        - true # x
+        - true # y
+        - true # z
+        - false # rx
+        - false # ry
+        - false # rz
+
+      # 质量 (Mass) - 虚拟惯性 (值越小，反应越快，太小会震荡)
+      # Having ".0" at the end is MUST, otherwise there is a loading error
+      # F = M*a + D*v + S*(x - x_d)
+      mass:
+        - 10.0
+        - 10.0
+        - 6.6
+        - 1.1
+        - 1.1
+        - 1.1
+
+      damping_ratio: # damping can be used instead: zeta = D / (2 * sqrt( M * S ))
+        - 2.828427 # x
+        - 2.828427 # y
+        - 10.0 # z
+        - 0.5 # rx
+        - 0.5 # ry
+        - 0.5 # rz
+
+      stiffness:
+        - 200.0
+        - 200.0
+        - 200.0
+        - 0.0
+        - 0.0
+        - 0.0
+
+      target_wrench:
+        - 0.0
+        - 0.0
+        - 5.0
+        - 0.0
+        - 0.0
+        - 0.0
+
+      force_control_axes:
+        - false  # x  → 导纳柔顺
+        - false  # y  → 导纳柔顺
+        - true   # z  → 恒力控制
+        - false  # rx → 导纳柔顺
+        - false  # ry → 导纳柔顺
+        - false  # rz → 导纳柔顺
+

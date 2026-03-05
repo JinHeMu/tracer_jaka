@@ -1,0 +1,8 @@
+
+initial_positions:
+  joint_1: 0.0
+  joint_2: 1.5707
+  joint_3: -1.5707
+  joint_4: 1.5707
+  joint_5: 1.5707
+  joint_6: 0.785398
