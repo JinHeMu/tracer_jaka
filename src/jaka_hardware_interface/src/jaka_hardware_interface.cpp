@@ -303,7 +303,7 @@ hardware_interface::return_type JakaHardwareInterface::read(
                   if (std::abs(pure_force) < 3) pure_force = 0.0;
                 }else
                 {
-                  if (std::abs(pure_force) < 0.5) pure_force = 0.0;
+                  if (std::abs(pure_force) < 0.1) pure_force = 0.0;
                 }
                 
                 
@@ -357,7 +357,7 @@ hardware_interface::return_type JakaHardwareInterface::write(
   }
 
   if (changed) {
-    robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
+      robot_.edg_servo_j(&joint_cmd_, MoveMode::ABS, 1);
     // printf("write joint value: %f, %f, %f, %f, %f, %f\n", 
     //   joint_cmd_.jVal[0], joint_cmd_.jVal[1], joint_cmd_.jVal[2], 
     //   joint_cmd_.jVal[3], joint_cmd_.jVal[4], joint_cmd_.jVal[5]);

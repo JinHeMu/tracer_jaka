@@ -12,7 +12,6 @@ int main(void)
 {
     
     int sensor_compensation, compliance_type;
-    int ret,cur_sensor;
     setlocale(LC_ALL, "");
     // robot.login_in(argv[1]);
     string default_ip = "10.5.5.100";
