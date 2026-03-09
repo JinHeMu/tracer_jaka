@@ -23,6 +23,7 @@ jaka_arm_controller:
       - joint_6
     interface_name: position
 
+
 jaka_fts_broadcaster:
   ros__parameters:
     sensor_name: "tcp_fts_sensor"
