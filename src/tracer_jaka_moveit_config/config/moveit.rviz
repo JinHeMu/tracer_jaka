@@ -10,8 +10,10 @@ Panels:
         - /MotionPlanning1/Planning Request1
         - /MotionPlanning1/Planning Metrics1
         - /MotionPlanning1/Planned Path1
+        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
-    Tree Height: 387
+    Tree Height: 196
   - Class: rviz_common/Help
     Name: Help
   - Class: rviz_common/Views
@@ -528,6 +530,167 @@ Visualization Manager:
         Show Robot Visual: true
       Value: true
       Velocity_Scaling_Factor: 0.1
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        Link_0:
+          Value: false
+        Link_1:
+          Value: false
+        Link_2:
+          Value: false
+        Link_3:
+          Value: false
+        Link_4:
+          Value: false
+        Link_5:
+          Value: false
+        Link_6:
+          Value: false
+        Link_6_45:
+          Value: false
+        aluminium_2_base_link:
+          Value: false
+        aluminium_3_base_link:
+          Value: false
+        aluminium_4_base_link:
+          Value: false
+        aluminium_base_link:
+          Value: false
+        base_footprint:
+          Value: false
+        base_link:
+          Value: false
+        camera_1_bottom_screw_frame:
+          Value: false
+        camera_link:
+          Value: false
+        connector_base_link:
+          Value: false
+        fl_castor_link:
+          Value: false
+        fl_wheel_link:
+          Value: false
+        fr_castor_link:
+          Value: false
+        fr_wheel_link:
+          Value: false
+        gripper_base_link:
+          Value: false
+        gripper_center_link:
+          Value: true
+        gripper_finger1_finger_link:
+          Value: false
+        gripper_finger1_finger_tip_link:
+          Value: false
+        gripper_finger1_inner_knuckle_link:
+          Value: false
+        gripper_finger1_knuckle_link:
+          Value: false
+        gripper_finger2_finger_link:
+          Value: false
+        gripper_finger2_finger_tip_link:
+          Value: false
+        gripper_finger2_inner_knuckle_link:
+          Value: false
+        gripper_finger2_knuckle_link:
+          Value: false
+        inertial_link:
+          Value: false
+        jaka_base_link:
+          Value: false
+        jk_se_vi_200_link:
+          Value: false
+        left_wheel_link:
+          Value: false
+        right_wheel_link:
+          Value: false
+        rl_castor_link:
+          Value: false
+        rl_wheel_link:
+          Value: false
+        rr_castor_link:
+          Value: false
+        rr_wheel_link:
+          Value: false
+        to_d435_link:
+          Value: false
+        urbase_base_link:
+          Value: false
+        world:
+          Value: false
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        world:
+          base_link:
+            aluminium_2_base_link:
+              {}
+            aluminium_3_base_link:
+              {}
+            aluminium_4_base_link:
+              {}
+            aluminium_base_link:
+              {}
+            base_footprint:
+              {}
+            fl_castor_link:
+              fl_wheel_link:
+                {}
+            fr_castor_link:
+              fr_wheel_link:
+                {}
+            inertial_link:
+              {}
+            jaka_base_link:
+              Link_0:
+                Link_1:
+                  Link_2:
+                    Link_3:
+                      Link_4:
+                        Link_5:
+                          Link_6:
+                            Link_6_45:
+                              jk_se_vi_200_link:
+                                gripper_base_link:
+                                  connector_base_link:
+                                    to_d435_link:
+                                      camera_1_bottom_screw_frame:
+                                        camera_link:
+                                          {}
+                                  gripper_finger1_inner_knuckle_link:
+                                    gripper_finger1_finger_tip_link:
+                                      {}
+                                  gripper_finger1_knuckle_link:
+                                    gripper_finger1_finger_link:
+                                      {}
+                                  gripper_finger2_inner_knuckle_link:
+                                    gripper_finger2_finger_tip_link:
+                                      {}
+                                  gripper_finger2_knuckle_link:
+                                    gripper_finger2_finger_link:
+                                      {}
+                                gripper_center_link:
+                                  {}
+            left_wheel_link:
+              {}
+            right_wheel_link:
+              {}
+            rl_castor_link:
+              rl_wheel_link:
+                {}
+            rr_castor_link:
+              rr_wheel_link:
+                {}
+            urbase_base_link:
+              {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -546,7 +709,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3.147038698196411
+      Distance: 2.367384195327759
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -561,15 +724,15 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.13000018894672394
+      Pitch: 0.36500000953674316
       Target Frame: base_link
       Value: Orbit (rviz_default_plugins)
-      Yaw: 5.5551862716674805
+      Yaw: 5.390186786651611
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1904
+  Height: 1016
   Help:
     collapsed: false
   Hide Left Dock: false
@@ -578,9 +741,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000001000000000000036a000006defc0200000005fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000007000fffffffb000000100044006900730070006c0061007900730100000069000001e70000017800fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000025c000003660000028e00fffffffb0000000800480065006c0070000000029a0000006e000000cf00fffffffb0000000a0056006900650077007301000005ce000001790000012300ffffff000006f9000006de00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000001000000000000036a0000039efc0200000005fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb000000100044006900730070006c006100790073010000003d00000101000000c900fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000144000001ca0000017d00fffffffb0000000800480065006c0070000000029a0000006e0000006e00fffffffb0000000a005600690065007700730100000314000000c7000000a400ffffff000003ca0000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 2671
-  X: 91
-  Y: 16
+  Width: 1850
+  X: 70
+  Y: 27

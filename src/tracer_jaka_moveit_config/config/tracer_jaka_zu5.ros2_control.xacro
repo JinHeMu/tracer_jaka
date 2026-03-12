@@ -10,6 +10,10 @@
                 <plugin>jaka_hardware_interface/JakaHardwareInterface</plugin>
                 <param name="robot_ip">10.5.5.100</param>
                 <param name="local_ip">10.5.5.127</param>
+                <param name="sensor_to_tcp_offset_x">0.0</param>
+                <param name="sensor_to_tcp_offset_y">0.0</param>
+                <param name="sensor_to_tcp_offset_z">0.205</param> 
+                <param name="sensor_z_angle">0.785398</param> 
             </hardware>
             <joint name="joint_1">
                 <command_interface name="position"/>

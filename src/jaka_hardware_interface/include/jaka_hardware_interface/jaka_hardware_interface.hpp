@@ -90,10 +90,16 @@ private:
   std::vector<double> ft_bias_;      // 存储零点偏移量
   bool bias_initialized_ = false;    // 标记是否已经完成了零点校准
 
+    // 传感器到 TCP 的偏移量 [x, y, z]
+  std::array<double, 3> sensor_to_tcp_offset_ = {0.0, 0.0, 0.0};
+  
+  // 传感器绕 Z 轴的安装旋转角 (弧度)
+  double sensor_z_angle_ = 0.0; 
+
 
 private:
     // 滤波系数 (0.0 ~ 1.0)
-    double filter_alpha_ = 0.5; 
+    double filter_alpha_ = 0.2; 
     
     // 简单的低通滤波函数
     inline double low_pass_filter(double current_raw, double prev_filtered) {

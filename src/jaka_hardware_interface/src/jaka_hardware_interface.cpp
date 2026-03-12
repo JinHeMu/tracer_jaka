@@ -55,6 +55,25 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_init(
     return CallbackReturn::ERROR;
   }
 
+    // 3. 获取力传感器 TCP 偏移参数与旋转参数 (带有默认值的安全解析)
+  auto it_off_x = info_.hardware_parameters.find("sensor_to_tcp_offset_x");
+  sensor_to_tcp_offset_[0] = (it_off_x != info_.hardware_parameters.end()) ? std::stod(it_off_x->second) : 0.0;
+
+  auto it_off_y = info_.hardware_parameters.find("sensor_to_tcp_offset_y");
+  sensor_to_tcp_offset_[1] = (it_off_y != info_.hardware_parameters.end()) ? std::stod(it_off_y->second) : 0.0;
+
+  auto it_off_z = info_.hardware_parameters.find("sensor_to_tcp_offset_z");
+  sensor_to_tcp_offset_[2] = (it_off_z != info_.hardware_parameters.end()) ? std::stod(it_off_z->second) : 0.18; // 默认 0.18m
+
+  auto it_angle = info_.hardware_parameters.find("sensor_z_angle");
+  sensor_z_angle_ = (it_angle != info_.hardware_parameters.end()) ? std::stod(it_angle->second) : (M_PI / 4.0); // 默认 45 度
+
+  RCLCPP_INFO(rclcpp::get_logger("JakaHardwareInterface"), 
+    "FTS Config - Offset: [%.3f, %.3f, %.3f], Z-Angle: %.3f rad", 
+    sensor_to_tcp_offset_[0], sensor_to_tcp_offset_[1], sensor_to_tcp_offset_[2], sensor_z_angle_);
+
+
+
   // 3. 初始化存储向量
   hw_position_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_velocity_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -290,33 +309,67 @@ hardware_interface::return_type JakaHardwareInterface::read(
             }
         }
 
-        // --- 4. 计算最终接触力 ---
+        // --- 4. 计算最终接触力 (带坐标系旋转与 TCP 杠杆补偿) ---
         if (bias_initialized_) {
+            
+            // 4.1 提取纯净的传感器原生数据 (Raw - Bias)
+            double fx_pure = hw_fts_raw_[0] - ft_bias_[0];
+            double fy_pure = hw_fts_raw_[1] - ft_bias_[1];
+            double fz_pure = hw_fts_raw_[2] - ft_bias_[2];
+            double tx_pure = hw_fts_raw_[3] - ft_bias_[3];
+            double ty_pure = hw_fts_raw_[4] - ft_bias_[4];
+            double tz_pure = hw_fts_raw_[5] - ft_bias_[5];
+
+            // 4.2 绕 Z 轴旋转对齐 (例如 45 度)
+            const double c = std::cos(sensor_z_angle_);
+            const double s = std::sin(sensor_z_angle_);
+
+            double fx_rot = fx_pure * c - fy_pure * s;
+            double fy_rot = fx_pure * s + fy_pure * c;
+            double fz_rot = fz_pure; // Z轴分量不受Z轴旋转影响
+
+            double tx_rot = tx_pure * c - ty_pure * s;
+            double ty_rot = tx_pure * s + ty_pure * c;
+            double tz_rot = tz_pure; // Z轴分量不受Z轴旋转影响
+
+            // 4.3 TCP 杠杆补偿 
+            // 补偿公式: M_tcp = M_rot - (R x F_rot)
+            double rx = sensor_to_tcp_offset_[0];
+            double ry = sensor_to_tcp_offset_[1];
+            double rz = sensor_to_tcp_offset_[2];
+
+            double tcp_tx = tx_rot - (ry * fz_rot - rz * fy_rot);
+            double tcp_ty = ty_rot - (rz * fx_rot - rx * fz_rot);
+            double tcp_tz = tz_rot - (rx * fy_rot - ry * fx_rot);
+
+            // 4.4 将处理完的数据打包，准备进行死区和滤波处理
+            std::array<double, 6> compensated_ft = {
+                fx_rot, fy_rot, fz_rot, 
+                tcp_tx, tcp_ty, tcp_tz
+            };
+
             for (int i = 0; i < 6; ++i) {
-                // 公式：Contact = Raw - Gravity - Bias
-                double pure_force = hw_fts_raw_[i] - ft_bias_[i];
+                double raw_val = compensated_ft[i];
+                
+                // 1. 先进行低通滤波：让数据平滑，消除高频噪声
+                hw_fts_states_[i] = filter_alpha_ * raw_val + (1.0 - filter_alpha_) * hw_fts_states_[i];
 
-                // hw_fts_states_[i] = hw_fts_raw_[i] - gravity_pred[i];
-                // // (可选) 死区处理：去除微小噪音
-                if (i < 3)
-                {
-                  if (std::abs(pure_force) < 3) pure_force = 0.0;
-                }else
-                {
-                  if (std::abs(pure_force) < 0.1) pure_force = 0.0;
+                // 2. 在滤波后的平滑状态上应用死区：强制清零微小漂移
+                if (i < 3) { // 力
+                    if (std::abs(hw_fts_states_[i]) < 3.0) {
+                        hw_fts_states_[i] = 0.0;
+                    }
+                } else {     // 力矩
+                    if (std::abs(hw_fts_states_[i]) < 0.1) {
+                        hw_fts_states_[i] = 0.0;
+                    }
                 }
-                
-                
-
-                // // (可选) 低通滤波: Y_new = alpha * X + (1-alpha) * Y_old
-                hw_fts_states_[i] = filter_alpha_ * pure_force + (1.0 - filter_alpha_) * hw_fts_states_[i];
             }
         } else {
-            // 未校准前，暂时输出原始值或0，防止飞车
-            // 这里选择输出0比较安全
-            hw_fts_states_[0] = 0.0; 
-            // ...
+            // 未校准前输出0，防止未准备好时的数据跳变导致飞车
+            std::fill(hw_fts_states_.begin(), hw_fts_states_.end(), 0.0);
         }
+
       }
   
   } else {

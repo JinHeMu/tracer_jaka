@@ -1015,7 +1015,7 @@
   <link name="base_footprint">
   </link>
   <joint name="gripper_center_joint" type="fixed">
-    <origin rpy="0 0 -0.785398" xyz="0 0 0.1885 "/>
+    <origin rpy="0 0 -0.785398" xyz="0 0 0.205 "/>
     <parent link="jk_se_vi_200_link"/>
     <child link="gripper_center_link"/>
   </joint>

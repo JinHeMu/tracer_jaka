@@ -72,6 +72,8 @@ private:
 
   // ── 回调 ────────────────────────────────────────────────────────────────────
   void wrenchCallback(const geometry_msgs::msg::WrenchStamped::SharedPtr msg);
+  // 新增：手柄话题回调函数声明
+  void joyTwistCallback(const geometry_msgs::msg::TwistStamped::SharedPtr msg);
   void enableCallback(const std_msgs::msg::Bool::SharedPtr msg);
   void controlLoop();
 
@@ -96,7 +98,10 @@ private:
 
   // 传感器数据（mutex 保护）
   std::mutex wrench_mutex_;
+  std::mutex joy_mutex_;
   geometry_msgs::msg::Wrench latest_wrench_{};
+  geometry_msgs::msg::Twist latest_joy_twist_;
+  bool joy_received_ = false;
   bool wrench_received_ = false;
 
   // 控制使能
@@ -105,7 +110,7 @@ private:
   // 时间步长
   double dt_        = 0.008;   // 默认 125 Hz
   double ctrl_rate_ = 125.0;
-
+  
   // 坐标系名称（twist 发布时的 frame_id）
   std::string control_frame_id_ = "base_link";
 
@@ -113,6 +118,7 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::WrenchStamped>::SharedPtr wrench_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr enable_sub_;
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_pub_;
+  rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr joy_sub_;
   rclcpp::TimerBase::SharedPtr ctrl_timer_;
 
   // 动态参数回调句柄

@@ -106,6 +106,8 @@ void ForceAdmittanceServoNode::declareParameters()
   // ── 速度限幅 ──
   this->declare_parameter<double>("max_linear_vel",  0.1);
   this->declare_parameter<double>("max_angular_vel", 0.5);
+
+
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -127,6 +129,7 @@ void ForceAdmittanceServoNode::loadParameters()
 
   params_.max_linear_vel  = this->get_parameter("max_linear_vel").as_double();
   params_.max_angular_vel = this->get_parameter("max_angular_vel").as_double();
+
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -150,6 +153,12 @@ void ForceAdmittanceServoNode::setupTopics()
   twist_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(
     twist_topic, rclcpp::SystemDefaultsQoS());
 
+  // 新增：订阅手柄参考速度
+  joy_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
+    "/joy_reference_twist", rclcpp::SystemDefaultsQoS(),
+    std::bind(&ForceAdmittanceServoNode::joyTwistCallback, this, std::placeholders::_1));
+
+  RCLCPP_INFO(this->get_logger(), "订阅手柄参考速度: /joy_reference_twist");
   RCLCPP_INFO(this->get_logger(), "订阅力矩话题: %s", wrench_topic.c_str());
   RCLCPP_INFO(this->get_logger(), "发布 Servo 速度话题: %s", twist_topic.c_str());
 }
@@ -179,6 +188,15 @@ void ForceAdmittanceServoNode::wrenchCallback(
   wrench_received_ = true;
 }
 
+
+void ForceAdmittanceServoNode::joyTwistCallback(const geometry_msgs::msg::TwistStamped::SharedPtr msg)
+{
+  std::lock_guard<std::mutex> lock(joy_mutex_);
+  latest_joy_twist_ = msg->twist;
+  joy_received_ = true;
+}
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  使能话题回调
 // ─────────────────────────────────────────────────────────────────────────────
@@ -207,6 +225,8 @@ void ForceAdmittanceServoNode::enableCallback(const std_msgs::msg::Bool::SharedP
 //  返回：该轴加速度 x_ddot
 // ─────────────────────────────────────────────────────────────────────────────
 
+
+
 double ForceAdmittanceServoNode::computeAxisAccel(
   int axis, double force_ctrl, const AxisState & state, const ControlParams & p) const
 {
@@ -214,26 +234,24 @@ double ForceAdmittanceServoNode::computeAxisAccel(
   const double d     = p.damping[axis];
   const double k     = p.stiffness[axis];
 
+
   switch (p.mode[axis]) {
     case AxisMode::DISABLED:
       return 0.0;
 
     case AxisMode::ADMITTANCE:
-      // 导纳：跟随外力，有刚度回弹
-      // M * x_ddot = F_ext - D * x_dot - K * x
+      // 导纳模式：暂保持原样。
+      // 注意：如果你发现在导纳模式下力矩的响应也是反的，请将这里的 force_ctrl 也改为 -force_ctrl
       return m_inv * (force_ctrl - d * state.velocity - k * state.position);
 
     case AxisMode::FORCE_CONTROL:
-      // 恒力：维持目标接触力
-      // 符号约定：F_ext 为环境对机器人的反力，接触时与施加方向相反
-      // M * x_ddot = (F_target + F_ext) - D * x_dot
-      //   → 当 |F_ext| < |F_target| 时，残差驱动机器人继续施力
-      return m_inv * (p.target_wrench[axis] + force_ctrl - d * state.velocity);
+        return m_inv * (p.target_wrench[axis] + force_ctrl - d * state.velocity);
 
     default:
       return 0.0;
   }
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  主控制循环
@@ -261,17 +279,25 @@ void ForceAdmittanceServoNode::controlLoop()
     wrench = latest_wrench_;
   }
 
+  // 新增：提取最新的手柄速度（线程安全）
+  geometry_msgs::msg::Twist joy_twist;
+  {
+    std::lock_guard<std::mutex> lock(joy_mutex_);
+    if (joy_received_) {
+      joy_twist = latest_joy_twist_;
+    } else {
+      // 如果还没收到手柄数据，默认全为0
+      joy_twist.linear.x = 0; joy_twist.linear.y = 0; joy_twist.linear.z = 0;
+      joy_twist.angular.x = 0; joy_twist.angular.y = 0; joy_twist.angular.z = 0;
+    }
+  }
+
   // 将力矩数据打包为 6 维向量（控制坐标系，这里假设传感器坐标系已与控制坐标系对齐）
   // 如需坐标变换，在此处旋转该向量
   const std::array<double, 6> F = {
     wrench.force.x,  wrench.force.y,  wrench.force.z,
     wrench.torque.x, wrench.torque.y, wrench.torque.z
   };
-
-  // const std::array<double, 6> F = {
-  //   0.0, 0.0, 0.0,
-  //   0.0, 0.0, 0.0
-  // };
 
 
   // ── 逐轴计算并积分 ──────────────────────────────────────────────────────────
@@ -294,6 +320,14 @@ void ForceAdmittanceServoNode::controlLoop()
 
     vel_out[i] = axis_state_[i].velocity;
   }
+
+  // 新增：叠加手柄的参考速度
+  vel_out[0] += joy_twist.linear.x;
+  vel_out[1] += joy_twist.linear.y;
+  vel_out[2] += joy_twist.linear.z;
+  vel_out[3] += joy_twist.angular.x;
+  vel_out[4] += joy_twist.angular.y;
+  vel_out[5] += joy_twist.angular.z;
 
   // ── 限幅 & 发布 ─────────────────────────────────────────────────────────────
   publishTwist(vel_out);
