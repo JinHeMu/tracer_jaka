@@ -57,12 +57,12 @@
     <child link="inertial_link"/>
   </joint>
   <!-- For testing, hang the robot up in the air -->
-  <!-- <link name="world" />
+  <link name="world" />
     <joint name="world_to_base_link=" type="fixed">
-        <origin xyz="0 0 0.5" rpy="0 0 0" />
+        <origin xyz="0 0 0.136" rpy="0 0 0" />
         <parent link="world"/>
         <child link="base_link"/>
-    </joint> -->
+    </joint>
   <link name="right_wheel_link">
     <!--<inertial>
                 <mass value="3" />

@@ -5,6 +5,8 @@ controller_manager:
 
     jaka_arm_controller:
       type: forward_command_controller/ForwardCommandController
+    # jaka_arm_controller:
+      # type: joint_trajectory_controller/JointTrajectoryController
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -22,6 +24,22 @@ jaka_arm_controller:
       - joint_5
       - joint_6
     interface_name: position
+
+# jaka_arm_controller:
+#   ros__parameters:
+#     joints:
+#       - joint_1
+#       - joint_2
+#       - joint_3
+#       - joint_4
+#       - joint_5
+#       - joint_6
+#     command_interfaces:
+#       - position
+
+#     state_interfaces:
+#       - position
+#       - velocity
 
 
 jaka_fts_broadcaster:

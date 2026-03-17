@@ -26,7 +26,7 @@ force_admittance_servo:
     #   2 = FORCE_CONTROL — 恒力控制，维持 target_wrench 设定的接触力
     #
     # 示例：xy 平面导纳，z 轴恒力压紧，旋转全禁用
-    axis_mode: [0, 0, 0, 2, 2, 0]
+    axis_mode: [1, 1, 1, 1, 1, 1]
 
     # ── 动力学参数 ────────────────────────────────────────────────────────────
     # 等效质量 [kg, kg, kg, kg·m², kg·m², kg·m²]
