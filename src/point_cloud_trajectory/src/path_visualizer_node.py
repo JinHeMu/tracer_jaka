@@ -35,7 +35,7 @@ class CoverageAndPcdVisualizer(Node):
         
         # --- 4. 读取 PCD 点云数据并预处理 ---
         pcd_file = '/home/ras/tracer_jaka/src/point_cloud_trajectory/pcd/filtered.pcd'
-        self.pcd_msg = self.load_and_transform_pcd(pcd_file, offset_x=0.0, offset_y=0.0, offset_z=0.0)
+        self.pcd_msg = self.load_and_transform_pcd(pcd_file, offset_x=0.0, offset_y=0.31, offset_z=0.0)
         
         # --- 5. 设置定时器 (1Hz 同步发布) ---
         self.timer = self.create_timer(1.0, self.timer_callback)
