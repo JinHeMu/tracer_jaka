@@ -46,8 +46,11 @@ class PathToServoController(Node):
         control_rate     = self.get_parameter('control_rate').value
 
         # ── 发布者 ────────────────────────────────────────────
+        # self.twist_pub = self.create_publisher(
+        #     TwistStamped, '/servo_node/delta_twist_cmds', 10)
+        # 改为
         self.twist_pub = self.create_publisher(
-            TwistStamped, '/servo_node/delta_twist_cmds', 10)
+            TwistStamped, '/tracker_reference_twist', 10)
 
         # ── TF 监听器 ─────────────────────────────────────────
         self.tf_buffer   = tf2_ros.Buffer()
@@ -173,8 +176,22 @@ class PathToServoController(Node):
         tgt_pos, tgt_quat = self.waypoints[self.current_idx]
 
         # 3. 计算位置误差 → 线速度
-        pos_err = tgt_pos - cur_pos                          # (3,)
-        linear_vel = self._clamp(self.kp_lin * pos_err, self.max_lin)
+        pos_err_base = tgt_pos - cur_pos
+        
+        # ★ 关键：将位置误差投影到工具坐标系，清零力控轴 ★
+        R_base_tool = R.from_quat(cur_quat).as_matrix()  # 3x3
+        R_tool_base = R_base_tool.T
+       
+        pos_err_tool = R_tool_base @ pos_err_base
+        
+            # 力控轴（工具Z）不由路径跟踪器修正
+        pos_err_tool[2] = 0.0
+        
+            # 变换回 base frame 计算速度
+        pos_err_filtered = R_base_tool @ pos_err_tool
+
+        
+        linear_vel = self._clamp(self.kp_lin * pos_err_filtered, self.max_lin)
 
         # 4. 计算姿态误差 → 角速度
         #    q_err = q_target ⊗ q_current^{-1}
@@ -189,7 +206,7 @@ class PathToServoController(Node):
         angular_vel = self._clamp(2.0 * self.kp_ang * ang_err, self.max_ang)
 
         # 5. 判断是否到达当前路径点
-        pos_dist = np.linalg.norm(pos_err)
+        pos_dist = np.linalg.norm(pos_err_filtered)  # 而非 pos_err_base
         rot_dist = 2.0 * np.linalg.norm(ang_err)            # 近似轴角误差 (rad)
 
         # if pos_dist < self.tol_pos and rot_dist < self.tol_rot:

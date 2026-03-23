@@ -39,6 +39,27 @@ static std::array<double, 6> toArray6(const std::vector<double> & v)
   return out;
 }
 
+bool ForceAdmittanceServoNode::getToolRotation(Eigen::Matrix3d & R_base_tool) const
+{
+  try {
+    auto tf = tf_buffer_->lookupTransform(
+      control_frame_id_, ee_frame_id_,
+      tf2::TimePointZero,
+      tf2::durationFromSec(0.02));
+
+    Eigen::Quaterniond q(
+      tf.transform.rotation.w,
+      tf.transform.rotation.x,
+      tf.transform.rotation.y,
+      tf.transform.rotation.z);
+
+    R_base_tool = q.toRotationMatrix();  // base → tool 的旋转
+    return true;
+  } catch (...) {
+    return false;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  构造 & 初始化
 // ─────────────────────────────────────────────────────────────────────────────
@@ -77,6 +98,7 @@ void ForceAdmittanceServoNode::declareParameters()
     "wrench_topic", "/tcp_fts_sensor/wrench");
   this->declare_parameter<std::string>(
     "servo_twist_topic", "/servo_node/delta_twist_cmds");
+     
   this->declare_parameter<std::string>(
     "enable_topic", "~/enable");
   this->declare_parameter<std::string>(
@@ -158,9 +180,17 @@ void ForceAdmittanceServoNode::setupTopics()
     "/joy_reference_twist", rclcpp::SystemDefaultsQoS(),
     std::bind(&ForceAdmittanceServoNode::joyTwistCallback, this, std::placeholders::_1));
 
+  tracker_sub_ = this->create_subscription<geometry_msgs::msg::TwistStamped>(
+    "/tracker_reference_twist", rclcpp::SystemDefaultsQoS(),
+    std::bind(&ForceAdmittanceServoNode::trackerTwistCallback, this, std::placeholders::_1));
+
   RCLCPP_INFO(this->get_logger(), "订阅手柄参考速度: /joy_reference_twist");
+  RCLCPP_INFO(this->get_logger(), "订阅跟踪参考速度: /tracker_reference_twist");
   RCLCPP_INFO(this->get_logger(), "订阅力矩话题: %s", wrench_topic.c_str());
   RCLCPP_INFO(this->get_logger(), "发布 Servo 速度话题: %s", twist_topic.c_str());
+
+  tf_buffer_   = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+  tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -195,6 +225,14 @@ void ForceAdmittanceServoNode::joyTwistCallback(const geometry_msgs::msg::TwistS
   latest_joy_twist_ = msg->twist;
   joy_received_ = true;
 }
+
+void ForceAdmittanceServoNode::trackerTwistCallback(const geometry_msgs::msg::TwistStamped::SharedPtr msg)
+{
+  std::lock_guard<std::mutex> lock(tracker_mutex_);
+  latest_tracker_twist_ = msg->twist;
+  tracker_received_ = true;
+}
+
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -272,13 +310,32 @@ void ForceAdmittanceServoNode::controlLoop()
     return;
   }
 
-  // ── 取最新力矩数据（线程安全）──────────────────────────────────────────────
+  // ── 1. 获取当前 base→tool 旋转矩阵 ──────────────────────
+  Eigen::Matrix3d R_base_tool;
+  if (!getToolRotation(R_base_tool)) {
+    RCLCPP_WARN_THROTTLE(this->get_logger(), *this->get_clock(), 2000,
+      "TF 查询失败，跳过本周期");
+    return;
+  }
+
+  Eigen::Matrix3d R_tool_base = R_base_tool.transpose();
+
+ // ── 2. 取力矩数据（已在工具坐标系下）──────────────────────
   geometry_msgs::msg::Wrench wrench;
   {
     std::lock_guard<std::mutex> lock(wrench_mutex_);
     wrench = latest_wrench_;
   }
 
+  // const std::array<double, 6> F = {
+  //   wrench.force.x,  wrench.force.y,  wrench.force.z,
+  //   wrench.torque.x, wrench.torque.y, wrench.torque.z
+  // };
+
+  const std::array<double, 6> F = {
+    0,  0,  0,
+    0, 0, 0
+  };
   // 新增：提取最新的手柄速度（线程安全）
   geometry_msgs::msg::Twist joy_twist;
   {
@@ -291,45 +348,71 @@ void ForceAdmittanceServoNode::controlLoop()
       joy_twist.angular.x = 0; joy_twist.angular.y = 0; joy_twist.angular.z = 0;
     }
   }
+  // joy base_link
+  Eigen::Matrix<double, 6, 1> joy_ref_tool;
+  joy_ref_tool << joy_twist.linear.x, joy_twist.linear.y, joy_twist.linear.z,
+                joy_twist.angular.x, joy_twist.angular.y, joy_twist.angular.z;
 
-  // 将力矩数据打包为 6 维向量（控制坐标系，这里假设传感器坐标系已与控制坐标系对齐）
-  // 如需坐标变换，在此处旋转该向量
-  const std::array<double, 6> F = {
-    wrench.force.x,  wrench.force.y,  wrench.force.z,
-    wrench.torque.x, wrench.torque.y, wrench.torque.z
-  };
+ // ── 3. 取路径跟踪器的参考速度（base_link 坐标系）─────────  
+  geometry_msgs::msg::Twist tracker_twist;
+  {
+    std::lock_guard<std::mutex> lock(tracker_mutex_);
+    if (tracker_received_) {
+      tracker_twist = latest_tracker_twist_;
+    } else {
+      tracker_twist.linear.x = 0; tracker_twist.linear.y = 0; tracker_twist.linear.z = 0;
+      tracker_twist.angular.x = 0; tracker_twist.angular.y = 0; tracker_twist.angular.z = 0;
+    }
+  }
+
+  // ── 4. 将路径参考速度从 base_link 变换到工具坐标系 ───────
+  Eigen::Vector3d v_path_base(tracker_twist.linear.x, tracker_twist.linear.y, tracker_twist.linear.z);
+  Eigen::Vector3d w_path_base(tracker_twist.angular.x, tracker_twist.angular.y, tracker_twist.angular.z);
+
+  Eigen::Vector3d v_path_tool = R_tool_base * v_path_base;
+  Eigen::Vector3d w_path_tool = R_tool_base * w_path_base;
+
+  Eigen::Matrix<double, 6, 1> path_ref_tool;
+  path_ref_tool << v_path_tool, w_path_tool;
 
 
-  // ── 逐轴计算并积分 ──────────────────────────────────────────────────────────
-  Eigen::Matrix<double, 6, 1> vel_out;
+  // ── 5. 轴权责分离：力控轴清零路径参考 ─────────────────────
+  //    只有 DISABLED 和 ADMITTANCE 轴接受路径参考
+  //    FORCE_CONTROL 轴的路径参考强制置零，防止闭环冲突
+  for (int i = 0; i < 6; ++i) {
+    if (params_.mode[i] == AxisMode::FORCE_CONTROL) {
+      path_ref_tool[i] = 0.0;  // 力控轴：路径跟踪器无权干预
+    }
+  }
 
+  // ── 6. 逐轴力控/导纳计算（工具坐标系下）──────────────────
+  Eigen::Matrix<double, 6, 1> vel_force_tool;
   for (int i = 0; i < 6; ++i) {
     if (params_.mode[i] == AxisMode::DISABLED) {
       axis_state_[i] = {0.0, 0.0, 0.0};
-      vel_out[i]     = 0.0;
+      vel_force_tool[i] = 0.0;
       continue;
     }
-
-    // 控制律 → 加速度
     const double accel = computeAxisAccel(i, F[i], axis_state_[i], params_);
-
-    // 欧拉积分
     axis_state_[i].velocity += accel * dt_;
     axis_state_[i].position += axis_state_[i].velocity * dt_;
-    axis_state_[i].accel     = accel;
-
-    vel_out[i] = axis_state_[i].velocity;
+    axis_state_[i].accel = accel;
+    vel_force_tool[i] = axis_state_[i].velocity;
   }
 
-  // 新增：叠加手柄的参考速度
-  vel_out[0] += joy_twist.linear.x;
-  vel_out[1] += joy_twist.linear.y;
-  vel_out[2] += joy_twist.linear.z;
-  vel_out[3] += joy_twist.angular.x;
-  vel_out[4] += joy_twist.angular.y;
-  vel_out[5] += joy_twist.angular.z;
+ 
 
-  // ── 限幅 & 发布 ─────────────────────────────────────────────────────────────
+    // ── 7. 在工具坐标系下叠加 ─────────────────────────────────
+  Eigen::Matrix<double, 6, 1> vel_total_tool = vel_force_tool + path_ref_tool;
+
+  // ── 8. 变换回 base_link 发布 ──────────────────────────────
+  Eigen::Vector3d v_total_base = R_base_tool * vel_total_tool.head<3>() + joy_ref_tool.head<3>();
+  Eigen::Vector3d w_total_base = R_base_tool * vel_total_tool.tail<3>() + joy_ref_tool.tail<3>();
+
+
+  Eigen::Matrix<double, 6, 1> vel_out;
+  vel_out << v_total_base, w_total_base;
+  
   publishTwist(vel_out);
 }
 

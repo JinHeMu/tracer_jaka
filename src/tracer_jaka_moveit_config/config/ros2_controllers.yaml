@@ -6,7 +6,7 @@ controller_manager:
     jaka_arm_controller:
       type: forward_command_controller/ForwardCommandController
     # jaka_arm_controller:
-      # type: joint_trajectory_controller/JointTrajectoryController
+    #   type: joint_trajectory_controller/JointTrajectoryController
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster

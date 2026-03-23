@@ -24,6 +24,10 @@
 #include <std_msgs/msg/bool.hpp>
 #include <rcl_interfaces/msg/set_parameters_result.hpp>
 
+#include <tf2_ros/buffer.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_eigen/tf2_eigen.hpp>
+
 #include <Eigen/Dense>
 
 namespace force_admittance_servo
@@ -65,6 +69,10 @@ public:
   explicit ForceAdmittanceServoNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions{});
 
 private:
+
+
+  bool getToolRotation(Eigen::Matrix3d & R_base_tool) const;
+
   // ── 初始化 ──────────────────────────────────────────────────────────────────
   void declareParameters();
   void loadParameters();
@@ -74,6 +82,8 @@ private:
   void wrenchCallback(const geometry_msgs::msg::WrenchStamped::SharedPtr msg);
   // 新增：手柄话题回调函数声明
   void joyTwistCallback(const geometry_msgs::msg::TwistStamped::SharedPtr msg);
+  void trackerTwistCallback(const geometry_msgs::msg::TwistStamped::SharedPtr msg);
+  
   void enableCallback(const std_msgs::msg::Bool::SharedPtr msg);
   void controlLoop();
 
@@ -99,10 +109,13 @@ private:
   // 传感器数据（mutex 保护）
   std::mutex wrench_mutex_;
   std::mutex joy_mutex_;
+  std::mutex tracker_mutex_;
   geometry_msgs::msg::Wrench latest_wrench_{};
   geometry_msgs::msg::Twist latest_joy_twist_;
+  geometry_msgs::msg::Twist latest_tracker_twist_;
   bool joy_received_ = false;
   bool wrench_received_ = false;
+  bool tracker_received_ = false;
 
   // 控制使能
   bool enabled_ = true;
@@ -113,13 +126,19 @@ private:
   
   // 坐标系名称（twist 发布时的 frame_id）
   std::string control_frame_id_ = "base_link";
+  std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
+  std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
+  std::string ee_frame_id_{"gripper_center_link"};  // 与你的URDF一致
 
   // ROS 通信
   rclcpp::Subscription<geometry_msgs::msg::WrenchStamped>::SharedPtr wrench_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr enable_sub_;
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_pub_;
   rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr joy_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr tracker_sub_;
   rclcpp::TimerBase::SharedPtr ctrl_timer_;
+
+  
 
   // 动态参数回调句柄
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr param_cb_handle_;
