@@ -27,7 +27,7 @@ class PathToServoController(Node):
             '/home/ras/tracer_jaka/src/point_cloud_trajectory/pcd/coverage_path.csv')
         self.declare_parameter('ee_frame',    'gripper_center_link')       # 末端执行器 TF 帧名
         self.declare_parameter('base_frame',  'world')       # 基坐标系 TF 帧名
-        self.declare_parameter('kp_linear',   30)           # 线速度比例增益
+        self.declare_parameter('kp_linear',   15)           # 线速度比例增益
         self.declare_parameter('kp_angular',  1.5)           # 角速度比例增益
         self.declare_parameter('max_linear',  0.4)          # 最大线速度 (m/s)
         self.declare_parameter('max_angular', 0.0)           # 最大角速度 (rad/s)

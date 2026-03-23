@@ -253,31 +253,18 @@ hardware_interface::CallbackReturn JakaHardwareInterface::on_deactivate(
 hardware_interface::return_type JakaHardwareInterface::read(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
- // 1. 使用 EDG 接口读取全量数据
+  // 1. 使用 EDG 接口读取全量数据
   errno_t ret = robot_.edg_get_stat(&edg_state_);
 
   if (ret == ERR_SUCC) 
   {
     // A. 更新关节状态
-    std::vector<double> current_joints(6); // 临时存关节角给神经网络用
     for (size_t i = 0; i < info_.joints.size() && i < 6; ++i) {
       hw_position_states_[i] = edg_state_.jointVal.jVal[i];
       hw_velocity_states_[i] = edg_state_.jointVel.jVel[i];
-      
-      current_joints[i] = hw_position_states_[i]; // 拷贝关节角
     }
 
-    // hw_fts_states_[0] = edg_state_.torqSensor.fx;
-    // hw_fts_states_[1] = edg_state_.torqSensor.fy;
-    // hw_fts_states_[2] = edg_state_.torqSensor.fz;
-
-    // hw_fts_states_[3] = edg_state_.torqSensor.tx;
-    // hw_fts_states_[4] = edg_state_.torqSensor.ty;
-    // hw_fts_states_[5] = edg_state_.torqSensor.tz;
-
-
-
-    // B. 更新力传感器数据 (带重力补偿 + 自动零偏去除)
+    // B. 更新力传感器数据 (使用固定偏置补偿)
     if (hw_fts_states_.size() == 6) {
         
         // --- 1. 获取原始数据 ---
@@ -288,92 +275,70 @@ hardware_interface::return_type JakaHardwareInterface::read(
         hw_fts_raw_[4] = edg_state_.torqSensor.ty;
         hw_fts_raw_[5] = edg_state_.torqSensor.tz;
 
-        // // --- 2. 神经网络预测重力 ---
-        // // 输入当前关节角，得到理论重力值
-        // std::vector<double> gravity_pred = ft_compensator_.predict(current_joints);
+        // --- 2. 设置固定偏置 (Fixed Bias) ---
+        // 注意：根据你的要求，这里直接硬编码提供的测量值
+        // Force Bias [x,y,z]: [-9.80, -6.78, -6.00] (N)
+        // Torque Bias [x,y,z]: [0.54, -0.63, 0.03] (Nm)
+        ft_bias_[0] = -9.80;
+        ft_bias_[1] = -6.78;
+        ft_bias_[2] = -6.00;
+        ft_bias_[3] = 0.54;
+        ft_bias_[4] = -0.63;
+        ft_bias_[5] = 0.03;
 
-        // --- 3. 自动零点校准 (Auto Tare) ---
-        // 仅在未初始化且数据有效时执行一次
-        if (!bias_initialized_) {
-            // 简单检查：确保不是全0数据（防止连接没建立时校准）
-            bool is_valid_data = false;
-            for(double v : hw_fts_raw_) { if(std::abs(v) > 1e-3) is_valid_data = true; }
+        // --- 3. 计算最终接触力 (带坐标系旋转与 TCP 杠杆补偿) ---
+        // 3.1 提取纯净的传感器原生数据 (Raw - Bias)
+        double fx_pure = hw_fts_raw_[0] - ft_bias_[0];
+        double fy_pure = hw_fts_raw_[1] - ft_bias_[1];
+        double fz_pure = hw_fts_raw_[2] - ft_bias_[2];
+        double tx_pure = hw_fts_raw_[3] - ft_bias_[3];
+        double ty_pure = hw_fts_raw_[4] - ft_bias_[4];
+        double tz_pure = hw_fts_raw_[5] - ft_bias_[5];
 
-            if (is_valid_data) {
-                for (int i = 0; i < 6; ++i) {
-                    // Bias = Raw - Pred
-                    // 含义：此时应该是0力，所以多出来的部分就是 Bias
-                    ft_bias_[i] = hw_fts_raw_[i];
-                }
-                bias_initialized_ = true;
-            }
-        }
+        // 3.2 绕 Z 轴旋转对齐 (例如 45 度)
+        const double c = std::cos(sensor_z_angle_);
+        const double s = std::sin(sensor_z_angle_);
 
-        // --- 4. 计算最终接触力 (带坐标系旋转与 TCP 杠杆补偿) ---
-        if (bias_initialized_) {
+        double fx_rot = fx_pure * c - fy_pure * s;
+        double fy_rot = fx_pure * s + fy_pure * c;
+        double fz_rot = fz_pure; 
+
+        double tx_rot = tx_pure * c - ty_pure * s;
+        double ty_rot = tx_pure * s + ty_pure * c;
+        double tz_rot = tz_pure; 
+
+        // 3.3 TCP 杠杆补偿 
+        // 补偿公式: M_tcp = M_rot - (R x F_rot)
+        double rx = sensor_to_tcp_offset_[0];
+        double ry = sensor_to_tcp_offset_[1];
+        double rz = sensor_to_tcp_offset_[2];
+
+        // 修正后的 TCP 力矩输出 (考虑了旋转后的力和力矩)
+        double tcp_tx = tx_rot - (ry * fz_rot - rz * fy_rot);
+        double tcp_ty = ty_rot - (rz * fx_rot - rx * fz_rot);
+        double tcp_tz = tz_rot - (rx * fy_rot - ry * fx_rot);
+
+        // 3.4 打包数据并进行后期处理
+        std::array<double, 6> compensated_ft = {
+            fx_rot, fy_rot, fz_rot, 
+            tcp_tx, tcp_ty, tcp_tz
+        };
+
+        for (int i = 0; i < 6; ++i) {
+            double raw_val = compensated_ft[i];
             
-            // 4.1 提取纯净的传感器原生数据 (Raw - Bias)
-            double fx_pure = hw_fts_raw_[0] - ft_bias_[0];
-            double fy_pure = hw_fts_raw_[1] - ft_bias_[1];
-            double fz_pure = hw_fts_raw_[2] - ft_bias_[2];
-            double tx_pure = hw_fts_raw_[3] - ft_bias_[3];
-            double ty_pure = hw_fts_raw_[4] - ft_bias_[4];
-            double tz_pure = hw_fts_raw_[5] - ft_bias_[5];
+            // 1. 低通滤波
+            hw_fts_states_[i] = filter_alpha_ * raw_val + (1.0 - filter_alpha_) * hw_fts_states_[i];
 
-            // 4.2 绕 Z 轴旋转对齐 (例如 45 度)
-            const double c = std::cos(sensor_z_angle_);
-            const double s = std::sin(sensor_z_angle_);
-
-            double fx_rot = fx_pure * c - fy_pure * s;
-            double fy_rot = fx_pure * s + fy_pure * c;
-            double fz_rot = fz_pure; // Z轴分量不受Z轴旋转影响
-
-            double tx_rot = tx_pure * c - ty_pure * s;
-            double ty_rot = tx_pure * s + ty_pure * c;
-            double tz_rot = tz_pure; // Z轴分量不受Z轴旋转影响
-
-            // 4.3 TCP 杠杆补偿 
-            // 补偿公式: M_tcp = M_rot - (R x F_rot)
-            double rx = sensor_to_tcp_offset_[0];
-            double ry = sensor_to_tcp_offset_[1];
-            double rz = sensor_to_tcp_offset_[2];
-
-            double tcp_tx = tx_rot - (ry * fz_rot - rz * fy_rot);
-            double tcp_ty = ty_rot - (rz * fx_rot - rx * fz_rot);
-            double tcp_tz = tz_rot - (rx * fy_rot - ry * fx_rot);
-
-            // 4.4 将处理完的数据打包，准备进行死区和滤波处理
-            std::array<double, 6> compensated_ft = {
-                fx_rot, fy_rot, fz_rot, 
-                tcp_tx, tcp_ty, tcp_tz
-            };
-
-            for (int i = 0; i < 6; ++i) {
-                double raw_val = compensated_ft[i];
-                
-                // 1. 先进行低通滤波：让数据平滑，消除高频噪声
-                hw_fts_states_[i] = filter_alpha_ * raw_val + (1.0 - filter_alpha_) * hw_fts_states_[i];
-
-                // 2. 在滤波后的平滑状态上应用死区：强制清零微小漂移
-                if (i < 3) { // 力
-                    if (std::abs(hw_fts_states_[i]) < 3.0) {
-                        hw_fts_states_[i] = 0.0;
-                    }
-                } else {     // 力矩
-                    if (std::abs(hw_fts_states_[i]) < 0.1) {
-                        hw_fts_states_[i] = 0.0;
-                    }
-                }
+            // 2. 死区处理 (注意：你之前的代码阈值是0，建议根据实际抖动设置为如 0.5 或 1.0)
+            const double deadband = (i < 3) ? 1.0 : 0.2; // 示例：力 0.2N, 力矩 0.02Nm
+            if (std::abs(hw_fts_states_[i]) < deadband) {
+                hw_fts_states_[i] = 0.0;
             }
-        } else {
-            // 未校准前输出0，防止未准备好时的数据跳变导致飞车
-            std::fill(hw_fts_states_.begin(), hw_fts_states_.end(), 0.0);
         }
-
       }
-  
   } else {
-    // 读取失败处理
+    // 读取失败处理：例如保持旧值或设为0
   }
 
   return hardware_interface::return_type::OK;

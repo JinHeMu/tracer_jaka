@@ -14,12 +14,12 @@ int main(void)
     // robot.login_in(argv[1]);
     string default_ip = "10.5.5.100";
     robot.login_in(default_ip.c_str());
-    // robot.power_on();
-    // cout << "robot login in" << endl;
-    // std::this_thread::sleep_for(std::chrono::seconds(8));
-    // robot.enable_robot();
-    // cout << "robot enable" << endl;
-    // std::this_thread::sleep_for(std::chrono::seconds(4));
+    robot.power_on();
+    cout << "robot login in" << endl;
+    std::this_thread::sleep_for(std::chrono::seconds(8));
+    robot.enable_robot();
+    cout << "robot enable" << endl;
+    std::this_thread::sleep_for(std::chrono::seconds(4));
     //Joint-space first-order low-pass filtering in robot servo mode
     robot.servo_move_use_joint_LPF(5);
     
