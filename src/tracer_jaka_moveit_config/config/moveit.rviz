@@ -6,20 +6,23 @@ Panels:
       Expanded:
         - /Grid1
         - /MotionPlanning1
-        - /MotionPlanning1/Scene Geometry1
         - /MotionPlanning1/Scene Robot1
         - /MotionPlanning1/Planning Request1
-        - /MotionPlanning1/Planning Metrics1
-        - /MotionPlanning1/Planned Path1
         - /TF1
         - /TF1/Frames1
-        - /PointCloud21
-        - /PointCloud21/Topic1
+        - /TF1/Tree1
         - /Path1
         - /Path1/Topic1
-        - /PoseArray1
+        - /PointCloud21
+        - /PointCloud21/Topic1
+        - /Pose1
+        - /normal1
+        - /normal1/Topic1
+        - /Marker1
+        - /Marker1/Status1
+        - /Marker1/Topic1
       Splitter Ratio: 0.5
-    Tree Height: 368
+    Tree Height: 380
   - Class: rviz_common/Help
     Name: Help
   - Class: rviz_common/Views
@@ -181,55 +184,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          gripper_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_center_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_finger1_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger1_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger1_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger1_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           inertial_link:
             Alpha: 1
             Show Axes: false
@@ -273,7 +227,16 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          shaver_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           to_d435_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          tool0:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -286,7 +249,7 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-        Loop Animation: false
+        Loop Animation: true
         Robot Alpha: 0.5
         Robot Color: 150; 50; 150
         Show Robot Collision: false
@@ -306,11 +269,11 @@ Visualization Manager:
       Planning Request:
         Colliding Link Color: 255; 0; 0
         Goal State Alpha: 1
-        Goal State Color: 249; 240; 107
+        Goal State Color: 250; 128; 0
         Interactive Marker Size: 0
         Joint Violation Color: 255; 0; 255
         Planning Group: jaka_arm
-        Query Goal State: true
+        Query Goal State: false
         Query Start State: false
         Show Workspace: false
         Start State Alpha: 1
@@ -325,7 +288,7 @@ Visualization Manager:
         Voxel Coloring: Z-Axis
         Voxel Rendering: Occupied Voxels
       Scene Robot:
-        Attached Body Color: 28; 113; 216
+        Attached Body Color: 150; 50; 150
         Links:
           All Links Enabled: true
           Expand Joint Details: false
@@ -434,55 +397,6 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-          gripper_base_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_center_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-          gripper_finger1_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger1_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger1_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger1_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_finger_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_finger_tip_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_inner_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
-          gripper_finger2_knuckle_link:
-            Alpha: 1
-            Show Axes: false
-            Show Trail: false
-            Value: true
           inertial_link:
             Alpha: 1
             Show Axes: false
@@ -526,7 +440,16 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          shaver_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+            Value: true
           to_d435_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          tool0:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -580,7 +503,7 @@ Visualization Manager:
         camera_1_bottom_screw_frame:
           Value: false
         camera_link:
-          Value: false
+          Value: true
         connector_base_link:
           Value: false
         fl_castor_link:
@@ -590,26 +513,6 @@ Visualization Manager:
         fr_castor_link:
           Value: false
         fr_wheel_link:
-          Value: false
-        gripper_base_link:
-          Value: false
-        gripper_center_link:
-          Value: true
-        gripper_finger1_finger_link:
-          Value: false
-        gripper_finger1_finger_tip_link:
-          Value: false
-        gripper_finger1_inner_knuckle_link:
-          Value: false
-        gripper_finger1_knuckle_link:
-          Value: false
-        gripper_finger2_finger_link:
-          Value: false
-        gripper_finger2_finger_tip_link:
-          Value: false
-        gripper_finger2_inner_knuckle_link:
-          Value: false
-        gripper_finger2_knuckle_link:
           Value: false
         inertial_link:
           Value: false
@@ -629,12 +532,16 @@ Visualization Manager:
           Value: false
         rr_wheel_link:
           Value: false
+        shaver_link:
+          Value: false
         to_d435_link:
           Value: false
+        tool0:
+          Value: true
         urbase_base_link:
           Value: false
         world:
-          Value: true
+          Value: false
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
@@ -671,26 +578,14 @@ Visualization Manager:
                           Link_6:
                             Link_6_45:
                               jk_se_vi_200_link:
-                                gripper_base_link:
-                                  connector_base_link:
-                                    to_d435_link:
-                                      camera_1_bottom_screw_frame:
-                                        camera_link:
-                                          {}
-                                  gripper_finger1_inner_knuckle_link:
-                                    gripper_finger1_finger_tip_link:
+                                connector_base_link:
+                                  to_d435_link:
+                                    camera_1_bottom_screw_frame:
                                       {}
-                                  gripper_finger1_knuckle_link:
-                                    gripper_finger1_finger_link:
+                                shaver_link:
+                                  tool0:
+                                    camera_link:
                                       {}
-                                  gripper_finger2_inner_knuckle_link:
-                                    gripper_finger2_finger_tip_link:
-                                      {}
-                                  gripper_finger2_knuckle_link:
-                                    gripper_finger2_finger_link:
-                                      {}
-                                gripper_center_link:
-                                  {}
             left_wheel_link:
               {}
             right_wheel_link:
@@ -704,6 +599,34 @@ Visualization Manager:
             urbase_base_link:
               {}
       Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
+      Color: 25; 255; 0
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Lines
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /coverage_path
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -740,58 +663,55 @@ Visualization Manager:
       Use rainbow: true
       Value: false
     - Alpha: 1
-      Buffer Length: 1
-      Class: rviz_default_plugins/Path
-      Color: 25; 255; 0
-      Enabled: true
-      Head Diameter: 0.30000001192092896
-      Head Length: 0.20000000298023224
-      Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
-      Name: Path
-      Offset:
-        X: 0
-        Y: 0
-        Z: 0
-      Pose Color: 255; 85; 255
-      Pose Style: None
-      Radius: 0.029999999329447746
-      Shaft Diameter: 0.10000000149011612
-      Shaft Length: 0.10000000149011612
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /coverage_path
-      Value: true
-    - Alpha: 1
-      Arrow Length: 0.009999999776482582
-      Axes Length: 0.30000001192092896
-      Axes Radius: 0.009999999776482582
-      Class: rviz_default_plugins/PoseArray
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz_default_plugins/Pose
       Color: 255; 25; 0
       Enabled: true
-      Head Length: 0.07000000029802322
-      Head Radius: 0.029999999329447746
-      Name: PoseArray
-      Shaft Length: 0.23000000417232513
-      Shaft Radius: 0.009999999776482582
-      Shape: Arrow (Flat)
+      Head Length: 0.30000001192092896
+      Head Radius: 0.10000000149011612
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.05000000074505806
+      Shape: Arrow
       Topic:
         Depth: 5
         Durability Policy: Volatile
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /coverage_poses
+        Value: ""
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: normal
+      Namespaces:
+        normals: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /coverage_normals_marker
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Marker
+      Namespaces:
+        directions: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /coverage_directions_marker
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: base_link
+    Fixed Frame: world
     Frame Rate: 30
   Name: root
   Tools:
@@ -806,30 +726,30 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.9518318176269531
+      Distance: 1.0481234788894653
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.10000000149011612
-        Y: 0.25
-        Z: 0.30000001192092896
+        X: 0.2421615868806839
+        Y: 0.15968403220176697
+        Z: 0.4496440887451172
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.36979666352272034
-      Target Frame: base_link
+      Pitch: 0.0399993434548378
+      Target Frame: world
       Value: Orbit (rviz_default_plugins)
-      Yaw: 1.2287648916244507
+      Yaw: 1.8456554412841797
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1016
+  Height: 1962
   Help:
     collapsed: false
   Hide Left Dock: false
@@ -838,9 +758,9 @@ Window Geometry:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000100000000000003a30000039efc0200000005fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000004100fffffffb000000100044006900730070006c006100790073010000003d000001ad000000c900fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e006701000001f0000001eb0000017d00fffffffb0000000800480065006c0070000000029a0000006e0000006e00fffffffb0000000a0056006900650077007300000004e000000135000000a400ffffff000003910000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000100000000000003a30000070efc0200000005fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000007a00fffffffb000000100044006900730070006c006100790073010000006e000001ea0000018200fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e0067010000026400000389000002b800fffffffb0000000800480065006c0070000000029a0000006e000000d400fffffffb0000000a0056006900650077007301000005f9000001830000013200ffffff0000077c0000070e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Views:
     collapsed: false
-  Width: 1850
-  X: 70
-  Y: 27
+  Width: 2859
+  X: 981
+  Y: 68

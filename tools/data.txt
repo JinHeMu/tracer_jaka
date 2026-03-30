@@ -18,3 +18,56 @@ Center of Mass [x,y,z]:   [-0.0093, -0.0094, 0.0551] (m)
 Force Bias [x,y,z]:       [-9.72, -6.54, -5.59] (N)
 Torque Bias [x,y,z]:      [0.46, -0.48, 0.01] (Nm)
 ========================================================
+
+
+
+[rviz2-1] [INFO] [1774341661.039641358] [moveit_handeye_calibration_target]: Set target real dimensions: 
+[rviz2-1] board_size_meters 0.280000
+[rviz2-1] marker_size_meters 0.030000
+[rviz2-1] 
+[rviz2-1] 
+[rviz2-1] [WARN] [1774341661.043868708] [rviz2]: Reprojection error:
+[rviz2-1] 0.00838639 m, 0.00417083 rad
+[rviz2-1] [INFO] [1774341661.043921310] [rviz2]: Publish camera transformation
+[rviz2-1]    0.999965  0.00169857  0.00822074  -0.0314055
+[rviz2-1] -0.00431668    0.943958    0.330036   -0.122286
+[rviz2-1] -0.00719945    -0.33006    0.943932   -0.177093
+[rviz2-1]           0           0           0           0
+[rviz2-1] from eef frame 'tool0'to sensor frame 'camera_color_optical_frame'
+
+[rviz2-1] [WARN] [1774342402.999148375] [rviz2]: Reprojection error:
+[rviz2-1] 0.0107493 m, 0.00476832 rad
+[rviz2-1] [INFO] [1774342402.999202325] [rviz2]: Publish camera transformation
+[rviz2-1]   0.999867 -0.0143342 0.00780812 -0.0304427
+[rviz2-1]  0.0109383   0.943459   0.331309  -0.126291
+[rviz2-1] -0.0121157   -0.33118    0.94349  -0.190857
+[rviz2-1]          0          0          0          0
+[rviz2-1] from eef frame 'tool0'to sensor frame 'camera_color_optical_frame'
+
+
+[rviz2-1] [WARN] [1774417722.307628391] [rviz2]: Reprojection error:
+[rviz2-1] 0.0229752 m, 0.0123325 rad
+[rviz2-1] [INFO] [1774417722.307685096] [rviz2]: Publish camera transformation
+[rviz2-1]    0.996569  -0.0715589   0.0415874 -0.00487936
+[rviz2-1]    0.071759    0.997416  -0.0033383   0.0149899
+[rviz2-1]  -0.0412411  0.00631112    0.999129  -0.0295564
+[rviz2-1]           0           0           0           0
+[rviz2-1] from eef frame 'tool0'to sensor frame 'camera_depth_optical_frame'
+
+[rviz2-1] 0.0244237 m, 0.0160804 rad
+[rviz2-1] [INFO] [1774418147.295510167] [rviz2]: Publish camera transformation
+[rviz2-1]   0.999588 -0.0255879  0.0129655 -0.0343193
+[rviz2-1]  0.0197815   0.942216   0.334421    -0.1246
+[rviz2-1] -0.0207734  -0.334027   0.942334  -0.178429
+[rviz2-1]          0          0          0          0
+[rviz2-1] from eef frame 'tool0'to sensor frame 'camera_color_optical_frame'
+
+
+
+[rviz2-1] 0.024043 m, 0.0126986 rad
+[rviz2-1] [INFO] [1774418510.262091595] [rviz2]: Publish camera transformation
+[rviz2-1]   0.999754 0.00846281   0.020501 -0.0357853
+[rviz2-1]  -0.014734   0.944317   0.328708  -0.125729
+[rviz2-1] -0.0165776  -0.328929   0.944209  -0.193685
+[rviz2-1]          0          0          0          0
+[rviz2-1] from eef frame 'tool0'to sensor frame 'camera_color_optical_frame'

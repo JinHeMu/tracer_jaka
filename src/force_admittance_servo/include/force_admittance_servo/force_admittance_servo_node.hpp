@@ -59,6 +59,8 @@ struct ControlParams
   std::array<double, 6>   target_wrench = {0.0};  ///< 恒力目标 [N 或 Nm]
   double max_linear_vel   = 0.1;    ///< 线速度限幅 [m/s]
   double max_angular_vel  = 0.5;    ///< 角速度限幅 [rad/s]
+  double max_linear_accel = 0.5;    ///< 线加速度限幅 [m/s²]
+  double max_angular_accel = 1.0;  ///< 角加速度限幅 [rad/s²]
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -69,6 +71,9 @@ public:
   explicit ForceAdmittanceServoNode(const rclcpp::NodeOptions & options = rclcpp::NodeOptions{});
 
 private:
+
+      // 在 ForceAdmittanceServoNode 类私有成员中添加
+  Eigen::Matrix<double, 6, 1> prev_vel_out_ = Eigen::Matrix<double, 6, 1>::Zero();
 
 
   bool getToolRotation(Eigen::Matrix3d & R_base_tool) const;
@@ -128,7 +133,7 @@ private:
   std::string control_frame_id_ = "base_link";
   std::shared_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
-  std::string ee_frame_id_{"gripper_center_link"};  // 与你的URDF一致
+  std::string ee_frame_id_{"tool0"};  // 与你的URDF一致
 
   // ROS 通信
   rclcpp::Subscription<geometry_msgs::msg::WrenchStamped>::SharedPtr wrench_sub_;
@@ -138,7 +143,7 @@ private:
   rclcpp::Subscription<geometry_msgs::msg::TwistStamped>::SharedPtr tracker_sub_;
   rclcpp::TimerBase::SharedPtr ctrl_timer_;
 
-  
+
 
   // 动态参数回调句柄
   rclcpp::node_interfaces::OnSetParametersCallbackHandle::SharedPtr param_cb_handle_;

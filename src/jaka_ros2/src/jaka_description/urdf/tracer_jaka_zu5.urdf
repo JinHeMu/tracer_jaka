@@ -1010,24 +1010,19 @@
       </geometry>
     </collision>
   </link>
-  <link name="gripper_center_link">
-  </link>
+
   <link name="base_footprint">
   </link>
-  <joint name="gripper_center_joint" type="fixed">
-    <origin rpy="0.5235 0 -0.785398" xyz="0 -0.025 0.225 "/>
-    <parent link="jk_se_vi_200_link"/>
-    <child link="gripper_center_link"/>
-  </joint>
+
   <joint name="jk_se_vi_200_joint" type="fixed">
     <origin rpy="0 0 0.785398" xyz="0 0 0.0315 "/>
     <parent link="Link_6_45"/>
     <child link="jk_se_vi_200_link"/>
   </joint>
   <joint name="connector_base_joint" type="fixed">
-    <parent link="gripper_base_link"/>
+    <parent link="jk_se_vi_200_link"/>
     <child link="connector_base_link"/>
-    <origin rpy="3.14 -1.57 -1.57" xyz="0 -0.0365 -0.005"/>
+    <origin rpy="0 -1.57 0.78" xyz="-0.0315 -0.0315 0"/>
     <!--origin
             xyz="0 0 0" rpy="0 0 0"/-->
   </joint>
@@ -1094,373 +1089,40 @@
       <inertia ixx="0.003881243" ixy="0.0" ixz="0.0" iyy="0.000498940" iyz="0.0" izz="0.003879257"/>
     </inertial>
   </link>
-  <joint name="gripper_base_joint" type="fixed">
+
+  <link name="shaver_link">
+    <visual>
+      <!-- the mesh origin is at front plate in between the two infrared camera axes -->
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://jaka_description/meshes/shaver/shaver.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="">
+        <color rgba="0.84706 0.84706 0.84706 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://jaka_description/meshes/shaver/shaver.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <joint name="shaver_joint" type="fixed">
+    <origin rpy="0 0 -0.785398" xyz="-0.01768 -0.01768 0.005"/>
     <parent link="jk_se_vi_200_link"/>
-    <child link="gripper_base_link"/>
-    <origin rpy="0 0 -0.7853" xyz="0 0 0.005"/>
+    <child link="shaver_link"/>
   </joint>
-  <link name="gripper_base_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/dh_base_link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/dh_base_link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.83416"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="0.0013016" ixy="-6.9374e-07" ixz="5.9848e-07" iyx="0.000000" iyy="0.00049972" iyz="2.0244E-07" izx="0.000000" izy="0.000000" izz="0.001498"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_base_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  
-  <joint name="gripper_finger1_joint" type="fixed">
-    <parent link="gripper_base_link"/>
-    <child link="gripper_finger1_knuckle_link"/>
-    <axis xyz="0 -1 0"/>
-    <origin rpy="0.0 0.0 3.141592653589793" xyz="-0.016 0 0.10586"/>
-    <limit effort="1000" lower="0.0" upper="0.65" velocity="2.0"/>
+
+  <link name="tool0" />
+
+  <joint name="tool0_joint" type="fixed">
+    <origin rpy="0.3491 0 0" xyz="0 -0.005 0.225"/>
+    <parent link="shaver_link"/>
+    <child link="tool0"/>
   </joint>
-  <joint name="gripper_finger2_joint" type="fixed">
-    <parent link="gripper_base_link"/>
-    <child link="gripper_finger2_knuckle_link"/>
-    <axis xyz="0 -1 0"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.016  0 0.10586 "/>
-    <limit effort="1000" lower="-3.14" upper="3.14" velocity="100.0"/>
-    <mimic joint="gripper_finger1_joint"/>
-  </joint>
-  <link name="gripper_finger1_knuckle_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/crank_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/crank_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.011111"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="3.88172e-06" ixy="-2.29456e-13" ixz="8.33e-07" iyx="0.000000" iyy="1.92174e-06" iyz="2.04435e-13" izx="0.000000" izy="0.000000" izz="4.32374e-06"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger1_knuckle_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <link name="gripper_finger2_knuckle_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/crank_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/crank_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.011111"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="3.88172e-06" ixy="-2.29456e-13" ixz="8.33e-07" iyx="0.000000" iyy="1.92174e-06" iyz="2.04435e-13" izx="0.000000" izy="0.000000" izz="4.32374e-06"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger2_knuckle_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <joint name="gripper_finger1_finger_joint" type="fixed">
-    <parent link="gripper_finger1_knuckle_link"/>
-    <child link="gripper_finger1_finger_link"/>
-    <axis xyz="0 -1 0"/>
-    <origin rpy="0 0 0" xyz="0.0292080077784 0.0 -0.0227132622407"/>
-    <limit effort="0.1" lower="-3.14" upper="3.14" velocity="100.0"/>
-    <mimic joint="gripper_finger1_joint" multiplier="0.4563942" offset="0"/>
-  </joint>
-  <joint name="gripper_finger2_finger_joint" type="fixed">
-    <parent link="gripper_finger2_knuckle_link"/>
-    <child link="gripper_finger2_finger_link"/>
-    <axis xyz="0 -1 0"/>
-    <origin rpy="0 0 0" xyz="0.0292080077784 0.0 -0.0227132622407"/>
-    <limit effort="0.1" lower="-3.14" upper="3.14" velocity="100.0"/>
-    <mimic joint="gripper_finger1_joint" multiplier="0.4563942" offset="0"/>
-  </joint>
-  <link name="gripper_finger1_finger_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/rod_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/rod_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.0222871"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="8.72836e-06" ixy="7.0843e-15" ixz="-2.18833e-06" iyx="-0.000002" iyy="7.26157e-06" iyz="7.6579e-15" izx="0.000000" izy="0.000000" izz="3.3425e-06"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger1_finger_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <link name="gripper_finger2_finger_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/rod_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/rod_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.0222871"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="8.72836e-06" ixy="7.0843e-15" ixz="-2.18833e-06" iyx="-0.000002" iyy="7.26157e-06" iyz="7.6579e-15" izx="0.000000" izy="0.000000" izz="3.3425e-06"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger2_finger_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <joint name="gripper_finger1_inner_knuckle_joint" type="fixed">
-    <parent link="gripper_base_link"/>
-    <child link="gripper_finger1_inner_knuckle_link"/>
-    <axis xyz="0 -1 0"/>
-    <origin rpy="0.0 0.0 3.141592653589793" xyz="-0.016 0 0.10586"/>
-    <limit effort="0.1" lower="-3.14" upper="3.14" velocity="100.0"/>
-    <mimic joint="gripper_finger1_joint" multiplier="1.49462955" offset="0"/>
-  </joint>
-  <joint name="gripper_finger2_inner_knuckle_joint" type="fixed">
-    <parent link="gripper_base_link"/>
-    <child link="gripper_finger2_inner_knuckle_link"/>
-    <axis xyz="0 -1 0"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.016 0 0.10586"/>
-    <limit effort="0.1" lower="-3.14" upper="3.14" velocity="100.0"/>
-    <mimic joint="gripper_finger1_joint" multiplier="1.49462955" offset="0"/>
-  </joint>
-  <link name="gripper_finger1_inner_knuckle_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/proximal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/proximal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.0318004"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="1.39848e-05" ixy="-9.54763e-15" ixz="-5.01422e-06" iyx="0.000000" iyy="1.04943e-05" iyz="8.94585e-16" izx="0.000000" izy="0.000000" izz="1.36183e-05"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger1_inner_knuckle_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <link name="gripper_finger2_inner_knuckle_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/proximal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/proximal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.0318004"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="1.39848e-05" ixy="-9.54763e-15" ixz="-5.01422e-06" iyx="0.000000" iyy="1.04943e-05" iyz="8.94585e-16" izx="0.000000" izy="0.000000" izz="1.36183e-05"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger2_inner_knuckle_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <joint name="gripper_finger1_finger_tip_joint" type="fixed">
-    <parent link="gripper_finger1_inner_knuckle_link"/>
-    <child link="gripper_finger1_finger_tip_link"/>
-    <axis xyz="0 1 0"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.0394969463769 0.0 0.0382752038125 "/>
-    <limit effort="0.1" lower="-3.14" upper="3.14" velocity="100.0"/>
-    <mimic joint="gripper_finger1_joint" multiplier="1.49462955"/>
-  </joint>
-  <joint name="gripper_finger2_finger_tip_joint" type="fixed">
-    <parent link="gripper_finger2_inner_knuckle_link"/>
-    <child link="gripper_finger2_finger_tip_link"/>
-    <axis xyz="0 1 0"/>
-    <origin rpy="0.0 0.0 0.0" xyz="0.0394969463769  0.0 0.0382752038125  "/>
-    <limit effort="0.1" lower="-3.14" upper="3.14" velocity="100.0"/>
-    <mimic joint="gripper_finger1_joint" multiplier="1.49462955"/>
-  </joint>
-  <link name="gripper_finger1_finger_tip_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/distal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/distal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.0124305"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="2.84217e-06" ixy="-2.48048e-15" ixz="8.24539e-07" iyx="0.000000" iyy="3.03961e-06" iyz="2.16427e-13" izx="0.000000" izy="0.000000" izz="1.11815e-06"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger1_finger_tip_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <link name="gripper_finger2_finger_tip_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/distal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-      <material name="">
-        <color rgba="0.84706 0.84706 0.84706 1"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://jaka_description/meshes/dh_robotics_ag95_description/meshes/visual/distal_phalanx_Link.STL" scale="0.001 0.001 0.001"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.0124305"/>
-      <origin xyz="0.0 0.0 0.0"/>
-      <inertia ixx="2.84217e-06" ixy="-2.48048e-15" ixz="8.24539e-07" iyx="0.000000" iyy="3.03961e-06" iyz="2.16427e-13" izx="0.000000" izy="0.000000" izz="1.11815e-06"/>
-    </inertial>
-  </link>
-  <gazebo reference="gripper_finger2_finger_tip_link">
-    <implicitSpringDamper>1</implicitSpringDamper>
-    <mu1>100000</mu1>
-    <mu2>100000</mu2>
-    <kp>100000000.0</kp>
-    <kd>1.0</kd>
-  </gazebo>
-  <transmission name="gripper_finger1_trans">
-    <type>transmission_interface/SimpleTransmission</type>
-    <joint name="gripper_finger1_joint">
-      <hardwareInterface>PositionJointInterface</hardwareInterface>
-    </joint>
-    <actuator name="gripper_finger1_motor">
-      <mechanicalReduction>1</mechanicalReduction>
-      <hardwareInterface>PositionJointInterface</hardwareInterface>
-    </actuator>
-  </transmission>
-  <gazebo>
-    <!-- loading plugin: mimic joints works in gazebo now -->
-    <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_dh_robotics_ag95_1">
-      <joint>gripper_finger1_joint</joint>
-      <mimicJoint>gripper_finger2_joint</mimicJoint>
-      <multiplier>1.0</multiplier>
-      <offset>0.0</offset>
-    </plugin>
-    <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_dh_robotics_ag95_2">
-      <joint>gripper_finger1_joint</joint>
-      <mimicJoint>gripper_finger2_inner_knuckle_joint</mimicJoint>
-      <multiplier>1.49462955</multiplier>
-      <offset>0.0</offset>
-    </plugin>
-    <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_dh_robotics_ag95_3">
-      <joint>gripper_finger1_joint</joint>
-      <mimicJoint>gripper_finger1_inner_knuckle_joint</mimicJoint>
-      <multiplier>1.49462955</multiplier>
-      <offset>0.0</offset>
-    </plugin>
-    <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_dh_robotics_ag95_4">
-      <joint>gripper_finger1_joint</joint>
-      <mimicJoint>gripper_finger1_finger_tip_joint</mimicJoint>
-      <multiplier>1.49462955</multiplier>
-      <offset>0.0</offset>
-    </plugin>
-    <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_dh_robotics_ag95_5">
-      <joint>gripper_finger1_joint</joint>
-      <mimicJoint>gripper_finger2_finger_tip_joint</mimicJoint>
-      <multiplier>1.49462955</multiplier>
-      <offset>0.0</offset>
-    </plugin>
-    <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_dh_robotics_ag95_6">
-      <joint>gripper_finger1_joint</joint>
-      <mimicJoint>gripper_finger1_finger_joint</mimicJoint>
-      <multiplier>0.4563942</multiplier>
-      <offset>0.0</offset>
-    </plugin>
-    <plugin filename="libroboticsgroup_gazebo_mimic_joint_plugin.so" name="mimic_dh_robotics_ag95_7">
-      <joint>gripper_finger1_joint</joint>
-      <mimicJoint>gripper_finger2_finger_joint</mimicJoint>
-      <multiplier>0.4563942</multiplier>
-      <offset>0.0</offset>
-    </plugin>
-  </gazebo>
+
   <!-- JOINT -->
   <joint name="tracer_aluminium" type="fixed">
     <origin rpy="0 0 1.57" xyz="-0.142 0.115 0.016 "/>

@@ -28,7 +28,7 @@ class MockFTSensor(Node):
         # 填充 Header
         msg.header.stamp = self.get_clock().now().to_msg()
         # 坐标系需与你的控制坐标系或传感器坐标系对齐
-        msg.header.frame_id = 'gripper_center_link' 
+        msg.header.frame_id = 'tool0' 
         
         # 计算已运行时间
         current_time = self.get_clock().now().nanoseconds / 1e9

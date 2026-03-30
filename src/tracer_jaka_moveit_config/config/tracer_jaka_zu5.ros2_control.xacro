@@ -6,14 +6,30 @@
         <ros2_control name="${name}" type="system">
             <hardware>
                 <!-- By default, set up controllers for simulation. This won't work on real hardware -->
-                <!-- <plugin>mock_components/GenericSystem</plugin> -->
-                <plugin>jaka_hardware_interface/JakaHardwareInterface</plugin>
+                <plugin>mock_components/GenericSystem</plugin>
+                <!-- <plugin>jaka_hardware_interface/JakaHardwareInterface</plugin> -->
                 <param name="robot_ip">10.5.5.100</param>
                 <param name="local_ip">10.5.5.127</param>
-                <param name="sensor_to_tcp_offset_x">0.0</param>
-                <param name="sensor_to_tcp_offset_y">0.0</param>
-                <param name="sensor_to_tcp_offset_z">0.205</param> 
-                <param name="sensor_z_angle">0.785398</param> 
+                
+                <!-- 力传感器偏置 -->
+                <param name="ft_bias_fx">-9.80</param>
+                <param name="ft_bias_fy">-6.78</param>
+                <param name="ft_bias_fz">-6.00</param>
+                <param name="ft_bias_tx">0.54</param>
+                <param name="ft_bias_ty">-0.63</param>
+                <param name="ft_bias_tz">0.03</param>
+
+                <param name="r_t_s_x">0.0</param>
+                <param name="r_t_s_y">-0.05</param>
+                <param name="r_t_s_z">-0.226</param>
+
+                <!-- 死区 -->
+                <param name="ft_deadband_force">1.0</param>
+                <param name="ft_deadband_torque">0.00</param>
+
+                <!-- 滤波系数 -->
+                <param name="ft_filter_alpha">0.1</param>
+
             </hardware>
             <joint name="joint_1">
                 <command_interface name="position"/>

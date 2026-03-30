@@ -49,7 +49,7 @@ DEFAULT_PARAMS = {
     "control_hz":         100.0,
 
     # --- 坐标系 ---
-    "command_frame_id":   "gripper_center_link",
+    "command_frame_id":   "tool0",
 }
 
 

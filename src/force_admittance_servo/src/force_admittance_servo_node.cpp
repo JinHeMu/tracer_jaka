@@ -128,6 +128,10 @@ void ForceAdmittanceServoNode::declareParameters()
   // ── 速度限幅 ──
   this->declare_parameter<double>("max_linear_vel",  0.1);
   this->declare_parameter<double>("max_angular_vel", 0.5);
+  
+  // 在 declareParameters() 中添加
+  this->declare_parameter<double>("max_linear_accel",  0.5);  // m/s^2
+  this->declare_parameter<double>("max_angular_accel", 1.0);  // rad/s^2
 
 
 }
@@ -148,6 +152,9 @@ void ForceAdmittanceServoNode::loadParameters()
   params_.damping       = toArray6(this->get_parameter("damping").as_double_array());
   params_.stiffness     = toArray6(this->get_parameter("stiffness").as_double_array());
   params_.target_wrench = toArray6(this->get_parameter("target_wrench").as_double_array());
+  // 在 loadParameters() 中添加
+  params_.max_linear_accel  = this->get_parameter("max_linear_accel").as_double();
+  params_.max_angular_accel = this->get_parameter("max_angular_accel").as_double();
 
   params_.max_linear_vel  = this->get_parameter("max_linear_vel").as_double();
   params_.max_angular_vel = this->get_parameter("max_angular_vel").as_double();
@@ -204,6 +211,7 @@ void ForceAdmittanceServoNode::resetState()
     s.velocity = 0.0;
     s.accel    = 0.0;
   }
+  prev_vel_out_.setZero(); // 重置平滑器的状态
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -420,29 +428,46 @@ void ForceAdmittanceServoNode::controlLoop()
 //  发布 TwistStamped → MoveIt Servo
 // ─────────────────────────────────────────────────────────────────────────────
 
-void ForceAdmittanceServoNode::publishTwist(const Eigen::Matrix<double, 6, 1> & vel)
+void ForceAdmittanceServoNode::publishTwist(const Eigen::Matrix<double, 6, 1> & vel_target)
 {
-  // 线速度限幅
-  double vx = std::clamp(vel[0], -params_.max_linear_vel,  params_.max_linear_vel);
-  double vy = std::clamp(vel[1], -params_.max_linear_vel,  params_.max_linear_vel);
-  double vz = std::clamp(vel[2], -params_.max_linear_vel,  params_.max_linear_vel);
-  // 角速度限幅
-  double wx = std::clamp(vel[3], -params_.max_angular_vel, params_.max_angular_vel);
-  double wy = std::clamp(vel[4], -params_.max_angular_vel, params_.max_angular_vel);
-  double wz = std::clamp(vel[5], -params_.max_angular_vel, params_.max_angular_vel);
+  Eigen::Matrix<double, 6, 1> vel_limited;
 
+  for (int i = 0; i < 6; ++i) {
+    // 1. 确定当前轴使用的加速度和速度限幅值
+    double max_accel = (i < 3) ? params_.max_linear_accel : params_.max_angular_accel;
+    double max_vel   = (i < 3) ? params_.max_linear_vel   : params_.max_angular_vel;
+
+    // 2. 加速度限幅：计算本周期允许的最大速度增量 (dv = a * dt)
+    double max_dv = max_accel * dt_;
+    double desired_dv = vel_target[i] - prev_vel_out_[i];
+    
+    // 限制 dv 的范围在 [-max_dv, max_dv]
+    double limited_dv = std::clamp(desired_dv, -max_dv, max_dv);
+    
+    // 3. 更新速度
+    vel_limited[i] = prev_vel_out_[i] + limited_dv;
+
+    // 4. 速度限幅：确保最终输出不超过最大允许速度
+    vel_limited[i] = std::clamp(vel_limited[i], -max_vel, max_vel);
+  }
+
+  // 更新上一周期速度记录
+  prev_vel_out_ = vel_limited;
+
+  // 5. 构造并发布消息
   geometry_msgs::msg::TwistStamped msg;
   msg.header.stamp    = this->now();
-  msg.header.frame_id = control_frame_id_;   // MoveIt Servo 按此 frame 解释速度
-  msg.twist.linear.x  = vx;
-  msg.twist.linear.y  = vy;
-  msg.twist.linear.z  = vz;
-  msg.twist.angular.x = wx;
-  msg.twist.angular.y = wy;
-  msg.twist.angular.z = wz;
+  msg.header.frame_id = control_frame_id_;
+  msg.twist.linear.x  = vel_limited[0];
+  msg.twist.linear.y  = vel_limited[1];
+  msg.twist.linear.z  = vel_limited[2];
+  msg.twist.angular.x = vel_limited[3];
+  msg.twist.angular.y = vel_limited[4];
+  msg.twist.angular.z = vel_limited[5];
 
   twist_pub_->publish(msg);
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  动态参数回调（运行时修改 target_wrench / mode 等，无需重启）
@@ -475,6 +500,10 @@ ForceAdmittanceServoNode::onParameterChange(const std::vector<rclcpp::Parameter>
         params_.max_linear_vel = p.as_double();
       } else if (p.get_name() == "max_angular_vel") {
         params_.max_angular_vel = p.as_double();
+      } else if (p.get_name() == "max_linear_accel") {
+        params_.max_linear_accel = p.as_double();
+      } else if (p.get_name() == "max_angular_accel") {
+        params_.max_angular_accel = p.as_double();
       }
     } catch (const std::exception & e) {
       result.successful = false;
