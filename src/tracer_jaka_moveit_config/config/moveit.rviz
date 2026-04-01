@@ -19,7 +19,6 @@ Panels:
         - /normal1
         - /normal1/Topic1
         - /Marker1
-        - /Marker1/Status1
         - /Marker1/Topic1
       Splitter Ratio: 0.5
     Tree Height: 380
@@ -581,11 +580,11 @@ Visualization Manager:
                                 connector_base_link:
                                   to_d435_link:
                                     camera_1_bottom_screw_frame:
-                                      {}
+                                      camera_link:
+                                        {}
                                 shaver_link:
                                   tool0:
-                                    camera_link:
-                                      {}
+                                    {}
             left_wheel_link:
               {}
             right_wheel_link:
@@ -693,7 +692,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /coverage_normals_marker
+        Value: /coverage_normals
       Value: true
     - Class: rviz_default_plugins/Marker
       Enabled: true
@@ -706,7 +705,7 @@ Visualization Manager:
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /coverage_directions_marker
+        Value: /coverage_directions
       Value: true
   Enabled: true
   Global Options:
@@ -726,7 +725,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.0481234788894653
+      Distance: 2.068809986114502
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -741,10 +740,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.0399993434548378
+      Pitch: 0.18999938666820526
       Target Frame: world
       Value: Orbit (rviz_default_plugins)
-      Yaw: 1.8456554412841797
+      Yaw: 1.8356554508209229
     Saved: ~
 Window Geometry:
   Displays:
