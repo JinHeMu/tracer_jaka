@@ -157,8 +157,10 @@ class PointCloudPreprocessor:
                 max_nn=self.p["normal_max_nn"]
             )
         )
-        pcd_clean.orient_normals_consistent_tangent_plane(
-            self.p["orient_tangent_k"]
+
+        # 统一让法线朝向原点
+        pcd_clean.orient_normals_towards_camera_location(
+            camera_location=np.array([0.0, 0.0, 0.0])
         )
 
         # ── 6. 泊松重建 ────────────────────────────────────────
@@ -393,20 +395,52 @@ class CoveragePathPlanner:
         total_area = 0.5 * np.linalg.norm(crosses, axis=1).sum()
         self.log(f"[PathPlanner] 表面积: {total_area:.4f} m²")
 
-        # ── 4. PCA 投影到 2D ─────────────────────────────────
-        fb(1, "PCA 求投影平面", 20)
+        # ── 4. PCA 求曲面法向 + 重建与世界 X 轴对齐的坐标系 ──────
+        fb(1, "PCA 求投影平面（X 轴对齐模式）", 20)
         center = xyz.mean(axis=0)
         cov    = np.cov((xyz - center).T)
         eigvals, eigvecs = np.linalg.eigh(cov)
-        idx    = np.argsort(eigvals)[::-1]
+        idx     = np.argsort(eigvals)[::-1]
         eigvecs = eigvecs[:, idx]
-        u_axis = eigvecs[:, 0]
-        v_axis = eigvecs[:, 1]
+
+        # PCA 最小特征值对应曲面法向量
+        proj_normal = eigvecs[:, 2]
+
+        # 令法向量与顶点法线均值方向一致
+        avg_n = normals.mean(axis=0)
+        avg_n_len = np.linalg.norm(avg_n)
+        if avg_n_len > 1e-12:
+            avg_n /= avg_n_len
+            if np.dot(proj_normal, avg_n) < 0:
+                proj_normal = -proj_normal
+
+        # 将世界 X 轴投影到曲面切平面，作为扫描行方向 u_axis
+        WORLD_X = np.array([1.0, 0.0, 0.0])
+        u_axis  = WORLD_X - np.dot(WORLD_X, proj_normal) * proj_normal
+        u_norm  = np.linalg.norm(u_axis)
+
+        if u_norm < 1e-6:
+            # 退化情况：法向量与 X 轴几乎平行，改用 Y 轴
+            self.log("[PathPlanner] 警告：曲面法向接近世界 X 轴，自动改用 Y 轴作为扫描方向")
+            WORLD_X = np.array([0.0, 1.0, 0.0])
+            u_axis  = WORLD_X - np.dot(WORLD_X, proj_normal) * proj_normal
+            u_axis /= np.linalg.norm(u_axis)
+        else:
+            u_axis /= u_norm
+
+        # 右手系叉乘得 v_axis（步进方向）
+        v_axis = np.cross(proj_normal, u_axis)
+        v_axis /= np.linalg.norm(v_axis)
+
+        angle_deg = float(np.degrees(np.arccos(np.clip(np.dot(u_axis, [1, 0, 0]), -1, 1))))
+        self.log(f"[PathPlanner] 扫描行方向 u_axis: {np.round(u_axis, 4)}"
+                f"  ← 与世界 X 轴夹角: {angle_deg:.2f}°")
 
         xyz_c  = xyz - center
         xyz_2d = np.column_stack([xyz_c @ u_axis, xyz_c @ v_axis])
         hull   = ConvexHull(xyz_2d)
         hull_pts = xyz_2d[hull.vertices]
+
 
         # ── 5. Boustrophedon 路径生成 ────────────────────────
         fb(2, "生成 Boustrophedon 路径", 35)
@@ -574,7 +608,7 @@ class PointCloudProcessorNode(Node):
     # ── 参数声明 ──────────────────────────────────────────────
 
     def _declare_parameters(self):
-        self.declare_parameter('paths.input_pcd',    'data/filtered.pcd')
+        self.declare_parameter('paths.input_pcd',    'data/frame_00000.pcd')
         self.declare_parameter('paths.output_pcd',   'data/cropped_cloud.pcd')
         self.declare_parameter('paths.output_ply',   'data/processed_mesh.ply')
         self.declare_parameter('paths.output_csv',   'outputs/coverage_path.csv')

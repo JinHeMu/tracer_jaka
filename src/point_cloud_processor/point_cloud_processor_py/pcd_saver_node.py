@@ -37,6 +37,11 @@ import sensor_msgs_py.point_cloud2 as pc2
 
 from point_cloud_processor.srv import SetSaving, GetSaverStatus
 
+import tf2_ros
+from tf2_ros import Buffer, TransformListener
+import tf2_sensor_msgs.tf2_sensor_msgs as tf2_sm   # PointCloud2 transform 支持
+from rclpy.duration import Duration
+
 
 class PcdSaverNode(Node):
 
@@ -47,7 +52,7 @@ class PcdSaverNode(Node):
         # ── 参数声明 ──────────────────────────────────────────
         self.declare_parameter('saver.topic_name',
                                '/camera/camera/depth/color/points')
-        self.declare_parameter('saver.save_dir',       'saved_pcds')
+        self.declare_parameter('saver.save_dir',       'data')
         self.declare_parameter('saver.save_interval_sec', 0.5)
         self.declare_parameter('saver.auto_start',     False)
         self.declare_parameter('saver.max_frames',     0)
@@ -91,6 +96,17 @@ class PcdSaverNode(Node):
             f"  保存目录 : {self._save_dir}\n"
             f"  服务     : ~/set_saving  ~/get_status"
         )
+
+        # ── TF2 监听器 ─────────────────────────────────────────
+        self.declare_parameter('saver.target_frame', 'world')   # 目标坐标系
+        self._target_frame = self.get_parameter('saver.target_frame').value
+
+        self._tf_buffer   = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
+        self.get_logger().info(
+            f"  目标坐标系 : {self._target_frame}（点云将变换到此系下保存）"
+        )
+
 
     # ─────────────────────────────────────────────────────────
     #  内部辅助
@@ -140,11 +156,25 @@ class PcdSaverNode(Node):
 
         self._last_save_t = now
 
-        # ── 解析 PointCloud2 ────────────────────────────────
+        # ── 1. TF 变换：将点云转到 world 坐标系 ────────────────
         try:
-            gen = pc2.read_points(msg,
-                                  field_names=("x", "y", "z", "rgb"),
-                                  skip_nans=True)
+            # 等待变换可用（最多 0.3 s，避免阻塞）
+            transform = self._tf_buffer.lookup_transform(
+                self._target_frame,              # 目标系：world
+                msg.header.frame_id,             # 源系：camera_depth_optical_frame
+                msg.header.stamp,
+                timeout=Duration(seconds=0.3)
+            )
+            msg_world = tf2_sm.do_transform_cloud(msg, transform)
+        except Exception as e:
+            self.get_logger().warn(f"[Saver] TF 变换失败，跳过本帧: {e}")
+            return
+
+        # ── 2. 解析变换后的 PointCloud2 ────────────────────────
+        try:
+            gen = pc2.read_points(msg_world,
+                                field_names=("x", "y", "z", "rgb"),
+                                skip_nans=True)
             points_data = np.array(list(gen))
         except Exception as e:
             self.get_logger().error(f"[Saver] 解析点云失败: {e}")
@@ -156,21 +186,21 @@ class PcdSaverNode(Node):
         # 兼容结构化数组 (ROS 2 Humble+) 和普通 2D 数组
         if points_data.ndim == 1 and points_data.dtype.names is not None:
             xyz       = np.column_stack((points_data['x'],
-                                         points_data['y'],
-                                         points_data['z']))
+                                        points_data['y'],
+                                        points_data['z']))
             rgb_float = points_data['rgb']
         else:
             xyz       = points_data[:, :3]
             rgb_float = points_data[:, 3]
 
-        # 解包 RGB
+        # 解包 RGB（与原逻辑相同）
         rgb_u32 = np.asarray(rgb_float, dtype=np.float32).view(np.uint32)
         r = np.bitwise_and(np.right_shift(rgb_u32, 16), 255)
         g = np.bitwise_and(np.right_shift(rgb_u32,  8), 255)
         b = np.bitwise_and(rgb_u32, 255)
         colors = np.vstack((r, g, b)).T / 255.0
 
-        # ── 保存 ────────────────────────────────────────────
+        # ── 3. 保存（与原逻辑相同）──────────────────────────────
         import open3d as o3d
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(xyz.astype(np.float64))
@@ -185,7 +215,7 @@ class PcdSaverNode(Node):
 
         self.get_logger().info(
             f"[Saver] 已保存第 {count} 帧 → {filename}"
-            f"（{len(xyz)} 个点）"
+            f"（{len(xyz)} 个点，坐标系: {self._target_frame}）"
         )
 
     # ─────────────────────────────────────────────────────────

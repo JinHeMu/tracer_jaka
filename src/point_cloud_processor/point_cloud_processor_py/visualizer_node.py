@@ -65,10 +65,10 @@ class VisualizerNode(Node):
         self.declare_parameter('visualizer.display_length_m', 0.02)
         self.declare_parameter('visualizer.direction_scale',  0.8)
         self.declare_parameter('visualizer.pcd_offset_x',    0.0)
-        self.declare_parameter('visualizer.pcd_offset_y',    0.31)
+        self.declare_parameter('visualizer.pcd_offset_y',    0.0)
         self.declare_parameter('visualizer.pcd_offset_z',    0.0)
         # y 轴偏移用于将点云与机器人坐标系对齐（对应原脚本的 offset_y=0.31）
-        self.declare_parameter('visualizer.path_offset_y',   0.4)
+        self.declare_parameter('visualizer.path_offset_y',   0.0)
         # 轨迹 y 轴偏移（对应原脚本 y + 0.4）
         self.declare_parameter('visualizer.normal_line_width',    0.0015)
         self.declare_parameter('visualizer.direction_line_width', 0.0015)
@@ -174,7 +174,7 @@ class VisualizerNode(Node):
         )
 
         for row in sampled:
-            x   = float(row['x']) - 0.2
+            x   = float(row['x'])
             y   = float(row['y']) + y_offset
             z   = float(row['z'])
             nx  = float(row['nx']); ny = float(row['ny']); nz = float(row['nz'])
