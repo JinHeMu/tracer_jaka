@@ -27,10 +27,10 @@ class PathToServoController(Node):
         self.declare_parameter('csv_file', '/home/ras/tracer_jaka/outputs/coverage_path.csv')
         self.declare_parameter('ee_frame',    'tool0')       # 末端执行器 TF 帧名
         self.declare_parameter('base_frame',  'world')       # 基坐标系 TF 帧名
-        self.declare_parameter('kp_linear',   15.0)           # 线速度比例增益
-        self.declare_parameter('kp_angular',  20.0)           # 角速度比例增益 (转向可以适当给大一点)
-        self.declare_parameter('max_linear',  1.2)           # 最大线速度 (m/s)
-        self.declare_parameter('max_angular', 0.8)           # 最大角速度 (rad/s)
+        self.declare_parameter('kp_linear',   5.0)           # 线速度比例增益
+        self.declare_parameter('kp_angular',  2.0)           # 角速度比例增益 (转向可以适当给大一点)
+        self.declare_parameter('max_linear',  0.8)           # 最大线速度 (m/s)
+        self.declare_parameter('max_angular', 0.6)           # 最大角速度 (rad/s)
         self.declare_parameter('goal_tol_pos',  0.005)       # 到达判定: 平面位置容差 (m)
         self.declare_parameter('goal_tol_rot',  0.08)        # 到达判定: 偏航姿态容差 (rad)
         self.declare_parameter('control_rate', 125.0)        # 控制频率 (Hz)
@@ -46,8 +46,12 @@ class PathToServoController(Node):
         control_rate     = self.get_parameter('control_rate').value
 
         # ── 发布者 ────────────────────────────────────────────
+        # self.twist_pub = self.create_publisher(
+        #     TwistStamped, '/tracker_reference_twist', 10)
+
         self.twist_pub = self.create_publisher(
-            TwistStamped, '/tracker_reference_twist', 10)
+            TwistStamped, '/servo_node/delta_twist_cmds', 10)
+
 
         # ── TF 监听器 ─────────────────────────────────────────
         self.tf_buffer   = tf2_ros.Buffer()
@@ -159,7 +163,7 @@ class PathToServoController(Node):
         pos_err_tool = R_tb @ pos_err_base
 
         # # ✅ 强制清零工具 Z（交给力控器）
-        pos_err_tool[2] = 0.0
+        #pos_err_tool[2] = 0.0
 
         # 转回基坐标系发出
         pos_err_filtered = R_bt @ pos_err_tool
