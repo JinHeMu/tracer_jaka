@@ -40,3 +40,7 @@ ros2 action send_goal /plan_coverage_path \
 
 # 4. 规划完成后热重载可视化（无需重启节点）
 ros2 service call /coverage_visualizer/reload std_srvs/srv/Trigger
+
+
+sudo chmod a+rw/dev/ttyUSB0 
+ros2 run dh5_controller dh5_controller_node
