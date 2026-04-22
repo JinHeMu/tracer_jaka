@@ -588,6 +588,22 @@ Visualization Manager:
           Value: false
         gripper_center_link:
           Value: true
+        gripper_finger1_finger_link:
+          Value: false
+        gripper_finger1_finger_tip_link:
+          Value: false
+        gripper_finger1_inner_knuckle_link:
+          Value: false
+        gripper_finger1_knuckle_link:
+          Value: false
+        gripper_finger2_finger_link:
+          Value: false
+        gripper_finger2_finger_tip_link:
+          Value: false
+        gripper_finger2_inner_knuckle_link:
+          Value: false
+        gripper_finger2_knuckle_link:
+          Value: false
         inertial_link:
           Value: false
         jaka_base_link:
@@ -654,7 +670,18 @@ Visualization Manager:
                                       camera_link:
                                         {}
                                 gripper_base_link:
-                                  {}
+                                  gripper_finger1_inner_knuckle_link:
+                                    gripper_finger1_finger_tip_link:
+                                      {}
+                                  gripper_finger1_knuckle_link:
+                                    gripper_finger1_finger_link:
+                                      {}
+                                  gripper_finger2_inner_knuckle_link:
+                                    gripper_finger2_finger_tip_link:
+                                      {}
+                                  gripper_finger2_knuckle_link:
+                                    gripper_finger2_finger_link:
+                                      {}
                                 gripper_center_link:
                                   {}
             left_wheel_link:

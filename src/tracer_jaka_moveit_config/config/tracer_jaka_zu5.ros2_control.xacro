@@ -9,7 +9,7 @@
                 <!-- <plugin>jaka_hardware_interface/JakaHardwareInterface</plugin> -->
                 <plugin>mock_components/GenericSystem</plugin>
                 <param name="robot_ip">10.5.5.100</param>
-                <param name="local_ip">10.5.5.127</param>
+                <param name="local_ip">10.5.5.166</param>
                 
                 <!-- 力传感器偏置 -->
                 <param name="ft_bias_fx">-9.80</param>

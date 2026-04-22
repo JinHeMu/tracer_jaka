@@ -4,7 +4,7 @@ controller_manager:
     update_rate: 125  # Hz
 
     # jaka_arm_controller:
-    #   type: joint_trajectory_controller/JointTrajectoryController
+      # type: joint_trajectory_controller/JointTrajectoryController
 
     jaka_arm_controller:
       type: forward_command_controller/ForwardCommandController
