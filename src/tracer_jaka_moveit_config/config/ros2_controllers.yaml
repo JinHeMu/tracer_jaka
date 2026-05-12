@@ -3,10 +3,10 @@ controller_manager:
   ros__parameters:
     update_rate: 125  # Hz
 
-    # jaka_arm_controller:
-      # type: joint_trajectory_controller/JointTrajectoryController
-
     jaka_arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    jaka_arm_servo_controller:
       type: forward_command_controller/ForwardCommandController
 
     joint_state_broadcaster:
@@ -15,22 +15,22 @@ controller_manager:
     jaka_fts_broadcaster:
       type: force_torque_sensor_broadcaster/ForceTorqueSensorBroadcaster
 
-# jaka_arm_controller:
-#   ros__parameters:
-#     joints:
-#       - joint_1
-#       - joint_2
-#       - joint_3
-#       - joint_4
-#       - joint_5
-#       - joint_6
-#     command_interfaces:
-#       - position
-#     state_interfaces:
-#       - position
-#       - velocity
-
 jaka_arm_controller:
+  ros__parameters:
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3
+      - joint_4
+      - joint_5
+      - joint_6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+jaka_arm_servo_controller:
   ros__parameters:
     joints:
       - joint_1

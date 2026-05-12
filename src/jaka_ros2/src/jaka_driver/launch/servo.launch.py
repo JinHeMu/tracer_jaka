@@ -113,7 +113,7 @@ def generate_launch_description():
     )
     jaka_arm_controller_spawner = Node(
         package="controller_manager", executable="spawner",
-        arguments=["jaka_arm_controller", "--controller-manager", "/controller_manager"],
+        arguments=["jaka_arm_servo_controller", "--controller-manager", "/controller_manager"],
         output="screen",
     )
     jaka_admittance_controller_spawner = Node(
