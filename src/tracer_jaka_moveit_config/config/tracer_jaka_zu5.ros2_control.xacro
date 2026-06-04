@@ -9,26 +9,26 @@
                 <plugin>jaka_hardware_interface/JakaHardwareInterface</plugin>
                 <!-- <plugin>mock_components/GenericSystem</plugin> -->
                 <param name="robot_ip">10.5.5.100</param>
-                <param name="local_ip">10.5.5.166</param>
-                
-                <!-- 力传感器偏置 -->
-                <param name="ft_bias_fx">-9.80</param>
-                <param name="ft_bias_fy">-6.78</param>
-                <param name="ft_bias_fz">-6.00</param>
-                <param name="ft_bias_tx">0.54</param>
-                <param name="ft_bias_ty">-0.63</param>
-                <param name="ft_bias_tz">0.03</param>
+                <param name="local_ip">10.5.5.127</param>
 
-                <param name="r_t_s_x">0.0</param>
-                <param name="r_t_s_y">-0.05</param>
-                <param name="r_t_s_z">-0.226</param>
+                <!-- 力传感器偏置 -->
+                <param name="ft_bias_fx">-7.79</param>
+                <param name="ft_bias_fy">-7.63</param>
+                <param name="ft_bias_fz">-0.21</param>
+                <param name="ft_bias_tx">0.74</param>
+                <param name="ft_bias_ty">-0.73</param>
+                <param name="ft_bias_tz">-0.02</param>
+                
+                <param name="r_t_s_x">-0.0080</param>
+                <param name="r_t_s_y">-0.0157</param>
+                <param name="r_t_s_z">0.27</param>
 
                 <!-- 死区 -->
-                <param name="ft_deadband_force">1.0</param>
+                <param name="ft_deadband_force">0.5</param>
                 <param name="ft_deadband_torque">0.00</param>
 
                 <!-- 滤波系数 -->
-                <param name="ft_filter_alpha">0.1</param>
+                <param name="ft_filter_alpha">0.0</param>
 
             </hardware>
             <joint name="joint_1">

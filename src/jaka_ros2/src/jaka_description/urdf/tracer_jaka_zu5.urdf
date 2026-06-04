@@ -1093,7 +1093,7 @@
   <link name="gripper_center_link">
   </link>
   <joint name="gripper_center_joint" type="fixed">
-    <origin rpy="0 0 -0.785398" xyz="0 0 0.225 "/>
+    <origin rpy="0 0 -0.785398" xyz="0 0 0.27 "/>
     <parent link="jk_se_vi_200_link"/>
     <child link="gripper_center_link"/>
   </joint>

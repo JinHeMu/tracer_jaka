@@ -15,8 +15,8 @@
     # 空间裁剪 (box_crop)
     # ─────────────────────────────────────────
     crop:
-      min_bound: [-0.2, -1.0, 0.6]
-      max_bound: [0.2,  1.0, 0.8]
+      min_bound: [-2.0, -1.0, -2.0]
+      max_bound: [2.0,  1.0, 2.0]
 
     # ─────────────────────────────────────────
     # 预处理 (pre_process)
@@ -33,25 +33,31 @@
       poisson_depth: 9            # 泊松重建深度
       poisson_density_quantile: 0.1  # 低密度面片剔除分位数
 
+      remove_plane_enable: true
+      plane_distance_threshold: 0.01
+      plane_ransac_n: 3
+      plane_num_iterations: 1000
+
+      keep_largest_cluster_enable: true
+      cluster_eps: 0.03
+      cluster_min_points: 30
+      cluster_min_remaining_points: 50
+
     # ─────────────────────────────────────────
     # 路径规划 (mesh_coverage_path)
     # ─────────────────────────────────────────
     path_planning:
-      tool_diameter: 0.04         # 工具直径 (m)
-      overlap_ratio: 0.15         # 行间重叠率 (0~1)
-      scan_direction: "x"         # 主扫描方向: "x" 或 "y"
-      # 重采样间距 = step_size / resample_divisor
-      resample_divisor: 8
-      # 路径平滑窗口
-      smooth_path_window: 3
-      smooth_normal_window: 10
-      smooth_direction_window: 8
-      # 跳变点剔除
-      outlier_window: 10
-      outlier_angle_threshold_deg: 45.0
-      # 可视化法向量长度 (m)
-      normal_display_length: 0.015
+      tool_diameter: 0.04
+      overlap_ratio: 0.15
+      scan_direction: 'x'
 
+      resample_divisor: 16
+      smooth_path_window: 8
+      smooth_normal_window: 20
+      smooth_direction_window: 12
+
+      outlier_window: 12
+      outlier_angle_threshold_deg: 35.0
     # ─────────────────────────────────────────
     # 节点行为
     # ─────────────────────────────────────────
@@ -61,12 +67,23 @@
       # 日志级别: DEBUG / INFO / WARN / ERROR
       log_level: "INFO"
 
+    transform:
+      enable: false                             # false 时输出仍为相机系
+      use_tf: false                             # true=用 tf2 实时查询；false=用下面静态值
+      source_frame: "camera_depth_optical_frame"  # 点云所在坐标系（D435i 直接出图通常是这个）
+      # source_frame: "camera_link"  # 点云所在坐标系（D435i 直接出图通常是这个）
+      target_frame: "world"                     # 目标世界系，也可填 base_link 等
+      lookup_timeout_sec: 5.0
+      static_translation: [0.0, 0.0, 0.0]       # 离线/无 tf 时使用，填手眼标定平移
+      static_quaternion:  [0.0, 0.0, 0.0, 1.0]  # [x, y, z, w]，填手眼标定旋转
+
+
     # ─────────────────────────────────────────
     # 轨迹与点云可视化 (visualizer_node)
     # ─────────────────────────────────────────
     visualizer:
-      csv_path:   "/home/a/tracer_jaka/outputs/coverage_path.csv"
-      pcd_path:   "/home/a/tracer_jaka/data/frame_00000.pcd"
+      csv_path:   "/home/ras/tracer_jaka/outputs/coverage_path.csv"
+      pcd_path:   "/home/ras/tracer_jaka/data/frame_00000.pcd"
       frame_id:   "world"
       publish_rate_hz: 1.0
       # CSV 降采样步长（1 = 不降，2 = 每隔 1 个取一个，以此类推）
@@ -78,7 +95,7 @@
       # 点云底图的坐标偏移 (m)，用于与机器人坐标系对齐
       pcd_offset_x: 0.0
       pcd_offset_y: 0.0
-      pcd_offset_z: 0.0
+      pcd_offset_z: 0.02
       # 轨迹点 y 轴偏移（与规划坐标系对齐）
       path_offset_y: 0.0
       # Marker 线宽 (m)

@@ -335,15 +335,15 @@ void ForceAdmittanceServoNode::controlLoop()
     wrench = latest_wrench_;
   }
 
-  // const std::array<double, 6> F = {
-  //   wrench.force.x,  wrench.force.y,  wrench.force.z,
-  //   wrench.torque.x, wrench.torque.y, wrench.torque.z
-  // };
-
   const std::array<double, 6> F = {
-    0,  0,  0,
-    0, 0, 0
+    wrench.force.x,  wrench.force.y,  wrench.force.z,
+    wrench.torque.x, wrench.torque.y, wrench.torque.z
   };
+
+  // const std::array<double, 6> F = {
+  //   0,  0,  0,
+  //   0, 0, 0
+  // };
   // 新增：提取最新的手柄速度（线程安全）
   geometry_msgs::msg::Twist joy_twist;
   {

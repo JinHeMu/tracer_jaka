@@ -1,14 +1,24 @@
 
+
+sshfs ras@192.168.3.17:/home/ras/ /home/a/nuc_mount/
+
+
+ros2 launch jaka_driver servo.launch.py 
+
 ros2 launch realsense2_camera rs_launch.py pointcloud.enable:=true align_depth.enable:=true
 
-
-ros2 launch force_admittance_servo force_admittance_servo.launch.py 
-ros2 launch moveit_servo jaka_servo_example.launch.py
+ros2 launch realsense2_camera rs_launch.py \
+  pointcloud.enable:=true \
+  align_depth.enable:=true \
 
 
 ros2 launch path_servo_control servo_control.launch.py 
 ros2 service call /path_servo/start std_srvs/srv/Trigger "{}"
 ros2 service call /path_servo/stop std_srvs/srv/Trigger "{}"
+
+ros2 launch force_admittance_servo force_admittance_servo.launch.py 
+
+
 
 
 

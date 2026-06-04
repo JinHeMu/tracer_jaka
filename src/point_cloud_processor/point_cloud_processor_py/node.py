@@ -12,14 +12,25 @@ ROS 2 节点：整合点云裁剪、预处理/重建、全覆盖路径规划三�
 
 动作（Action）
   /process_point_cloud  [ProcessPointCloud]
-      完整预处理流水线：裁剪 → 降采样 → 滤波 → 法线 → 泊松重建
+      完整预处理流水线：裁剪 → 降采样 → 滤波 → 平面去除 → 最大工件簇提取 → 法线 → 泊松重建
   /plan_coverage_path   [PlanCoveragePath]
-      全覆盖路径规划：读网格 → PCA → Boustrophedon → 投影 → 平滑 → 导出
+      全覆盖路径规划：读网格 → PCA → Boustrophedon → 投影 → 平滑 → 坐标变换 → 导出
 
 参数由 config/params.yaml 统一管理，节点启动时自动加载。
+
+坐标系说明
+----------
+相机（D435i）采集的点云通常位于相机光学坐标系
+（camera_depth_optical_frame：x 向右、y 向下、z 向前）。
+本节点在导出路径前，会把路径从相机系变换到世界系（world）：
+  * 优先通过 tf2 查询 source_frame → target_frame 的实时变换；
+  * 若 tf 不可用，则回退到静态参数（static_translation / static_quaternion，
+    可直接填入手眼标定结果）。
+点（位置）使用完整刚体变换，法线/方向向量只做旋转。
 """
 
 import os
+import math
 import time
 import threading
 
@@ -29,6 +40,12 @@ from rclpy.node import Node
 from rclpy.action import ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import MultiThreadedExecutor
+from rclpy.duration import Duration
+import rclpy.time
+
+# tf2：用于查询相机系 → 世界系的实时变换
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener
 
 # ROS 2 接口（由本包 CMakeLists.txt 生成）
 from point_cloud_processor.srv import CropPointCloud
@@ -44,6 +61,46 @@ def _get_list(node: Node, name: str, default):
         return list(val) if val is not None else default
     except Exception:
         return default
+
+
+# ═══════════════════════════════════════════════════════════════
+#  辅助：四元数 / 变换矩阵工具
+# ═══════════════════════════════════════════════════════════════
+def quaternion_to_rotation_matrix(q) -> np.ndarray:
+    """四元数 [x, y, z, w] → 3×3 旋转矩阵"""
+    x, y, z, w = float(q[0]), float(q[1]), float(q[2]), float(q[3])
+    n = math.sqrt(x * x + y * y + z * z + w * w)
+    if n < 1e-12:
+        return np.eye(3)
+    x, y, z, w = x / n, y / n, z / n, w / n
+    return np.array([
+        [1 - 2 * (y * y + z * z), 2 * (x * y - z * w),     2 * (x * z + y * w)],
+        [2 * (x * y + z * w),     1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+        [2 * (x * z - y * w),     2 * (y * z + x * w),     1 - 2 * (x * x + y * y)],
+    ], dtype=float)
+
+
+def make_transform_matrix(translation, quaternion) -> np.ndarray:
+    """平移 [x,y,z] + 四元数 [x,y,z,w] → 4×4 齐次变换矩阵"""
+    T = np.eye(4)
+    T[:3, :3] = quaternion_to_rotation_matrix(quaternion)
+    T[:3, 3] = np.asarray(translation, dtype=float)
+    return T
+
+
+def apply_transform_to_path(path_3d, normals, dirs, transform):
+    """
+    将路径变换到目标坐标系。
+
+    points : p' = R · p + t
+    vectors: v' = R · v   （法线、方向向量不加平移）
+    """
+    R = transform[:3, :3]
+    t = transform[:3, 3]
+    path_3d = path_3d @ R.T + t
+    normals = normals @ R.T
+    dirs    = dirs @ R.T
+    return path_3d, normals, dirs
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -93,12 +150,133 @@ class BoxCropper:
 #  模块 2：预处理 + 泊松重建（对应 pre_process.py）
 # ═══════════════════════════════════════════════════════════════
 class PointCloudPreprocessor:
-    """降采样 → 统计/半径滤波 → 法线估计 → 泊松重建"""
+    """降采样 → 统计/半径滤波 → 平面去除 → 最大工件簇提取 → 法线估计 → 泊松重建"""
 
     def __init__(self, params: dict, logger=None):
         self.p = params
         self.log = logger.info if logger else print
         self.logw = logger.warn if logger else print
+
+    def _remove_plane_and_keep_largest_cluster(self, pcd):
+        """
+        平面去除后，只保留最大的团状工件部分。
+
+        流程：
+        1. RANSAC 分割最大平面；
+        2. 删除平面内点；
+        3. 对剩余点云做 DBSCAN 聚类；
+        4. 只保留点数最多的非噪声簇；
+        5. 其余小簇和噪声点全部删除。
+        """
+        if pcd.is_empty():
+            return False, "输入点云为空，无法进行平面去除和聚类", pcd
+
+        work_pcd = pcd
+
+        # ── 1. RANSAC 平面去除 ───────────────────────────────
+        if self.p.get("remove_plane_enable", True):
+            ransac_n = int(self.p.get("plane_ransac_n", 3))
+
+            if len(work_pcd.points) < ransac_n:
+                return False, "点数不足，无法进行 RANSAC 平面分割", work_pcd
+
+            distance_threshold = float(
+                self.p.get("plane_distance_threshold", 0.01)
+            )
+            num_iterations = int(
+                self.p.get("plane_num_iterations", 1000)
+            )
+
+            plane_model, inliers = work_pcd.segment_plane(
+                distance_threshold=distance_threshold,
+                ransac_n=ransac_n,
+                num_iterations=num_iterations
+            )
+
+            plane_count = len(inliers)
+            total_count = len(work_pcd.points)
+
+            self.log(
+                "[Preprocessor] 平面模型: "
+                f"{np.round(plane_model, 6)}, "
+                f"平面点数: {plane_count}/{total_count}"
+            )
+
+            work_pcd = work_pcd.select_by_index(inliers, invert=True)
+
+            if work_pcd.is_empty():
+                return False, (
+                    "平面去除后点云为空。"
+                    "请检查 crop 边界或调小 preprocess.plane_distance_threshold"
+                ), work_pcd
+
+            self.log(
+                f"[Preprocessor] 平面去除后剩余: {len(work_pcd.points)} 点"
+            )
+
+        # ── 2. DBSCAN 聚类，只保留最大工件簇 ─────────────────
+        if self.p.get("keep_largest_cluster_enable", True):
+            if work_pcd.is_empty():
+                return False, "聚类前点云为空", work_pcd
+
+            eps = float(self.p.get("cluster_eps", 0.03))
+            min_points = int(self.p.get("cluster_min_points", 30))
+            min_remaining = int(
+                self.p.get("cluster_min_remaining_points", 50)
+            )
+
+            labels = np.asarray(
+                work_pcd.cluster_dbscan(
+                    eps=eps,
+                    min_points=min_points,
+                    print_progress=False
+                )
+            )
+
+            if labels.size == 0:
+                return False, "DBSCAN 聚类失败：没有标签结果", work_pcd
+
+            valid_mask = labels >= 0
+
+            if not np.any(valid_mask):
+                return False, (
+                    "DBSCAN 未找到有效工件簇。"
+                    "请适当增大 preprocess.cluster_eps "
+                    "或减小 preprocess.cluster_min_points"
+                ), work_pcd
+
+            cluster_ids, cluster_counts = np.unique(
+                labels[valid_mask],
+                return_counts=True
+            )
+
+            largest_cluster_id = cluster_ids[np.argmax(cluster_counts)]
+            largest_indices = np.where(labels == largest_cluster_id)[0]
+
+            if len(largest_indices) < min_remaining:
+                return False, (
+                    f"最大工件簇点数过少，仅 {len(largest_indices)} 点。"
+                    "请检查裁剪区域、平面去除阈值或聚类参数"
+                ), work_pcd
+
+            noise_count = int(np.sum(labels < 0))
+            removed_points = len(work_pcd.points) - len(largest_indices)
+
+            self.log(
+                "[Preprocessor] DBSCAN 聚类完成："
+                f"簇数量={len(cluster_ids)}, "
+                f"噪声点={noise_count}, "
+                f"最大簇ID={largest_cluster_id}, "
+                f"最大簇点数={len(largest_indices)}, "
+                f"删除非最大簇/噪声点={removed_points}"
+            )
+
+            work_pcd = work_pcd.select_by_index(largest_indices.tolist())
+
+            if work_pcd.is_empty():
+                return False, "最大工件簇提取后点云为空", work_pcd
+
+        return True, "平面去除与最大工件簇提取完成", work_pcd
 
     def run(self, input_pcd_path: str,
             output_ply_path: str,
@@ -147,6 +325,19 @@ class PointCloudPreprocessor:
         )
         pcd_clean = pcd_sor.select_by_index(ind)
         self.log(f"[Preprocessor] 清洗后: {len(pcd_clean.points)} 点")
+
+        # ── 4.5 平面去除 + 最大工件簇保留 ─────────────────────
+        fb(2, "平面去除 + 最大工件簇提取", 52)
+        ok, msg, pcd_clean = self._remove_plane_and_keep_largest_cluster(
+            pcd_clean
+        )
+
+        if not ok:
+            return False, msg, 0, 0
+
+        self.log(
+            f"[Preprocessor] 最终用于重建的工件点数: {len(pcd_clean.points)}"
+        )
 
         # ── 5. 法线估计 ────────────────────────────────────────
         fb(3, "法线估计", 60)
@@ -359,8 +550,15 @@ class CoveragePathPlanner:
     def run(self, ply_path: str,
             csv_path: str,
             gcode_path: str,
-            feedback_cb=None) -> tuple[bool, str, int, float, float]:
+            feedback_cb=None,
+            transform=None) -> tuple[bool, str, int, float, float]:
         """
+        Parameters
+        ----------
+        transform : 4×4 np.ndarray 或 None
+            相机系 → 世界系（目标系）的齐次变换矩阵。
+            为 None 时输出保持原坐标系（相机系）。
+
         Returns
         -------
         (success, message, point_count, total_length, coverage_pct)
@@ -441,7 +639,6 @@ class CoveragePathPlanner:
         hull   = ConvexHull(xyz_2d)
         hull_pts = xyz_2d[hull.vertices]
 
-
         # ── 5. Boustrophedon 路径生成 ────────────────────────
         fb(2, "生成 Boustrophedon 路径", 35)
         tool_d    = p["tool_diameter"]
@@ -487,7 +684,20 @@ class CoveragePathPlanner:
         self.log(f"[PathPlanner] 剔除跳变点: {removed}")
         path_directions = self._smooth_array(path_directions, 5)
 
+        # ── 9.5 坐标系变换（相机系 → 世界系）─────────────────
+        # 所有几何处理（PCA、投影、平滑等）都依赖原始网格坐标系，
+        # 因此变换放在最后一步、导出之前执行。
+        if transform is not None:
+            fb(3, "坐标系变换（相机系 → 世界系）", 88)
+            path_3d, path_normals, path_directions = apply_transform_to_path(
+                path_3d, path_normals, path_directions, transform
+            )
+            self.log("[PathPlanner] 已将路径变换到目标坐标系（世界系）")
+        else:
+            self.log("[PathPlanner] 未提供变换矩阵，路径保持原坐标系（相机系）")
+
         # ── 10. 统计 & 导出 ──────────────────────────────────
+        # 注意：路径长度、覆盖率等统计量在刚体变换下保持不变。
         seg_lens  = np.linalg.norm(np.diff(path_3d, axis=0), axis=1)
         total_len = float(seg_lens.sum())
         coverage  = min(100.0, total_len * tool_d / total_area * 100)
@@ -562,6 +772,10 @@ class PointCloudProcessorNode(Node):
         self._preprocessor = PointCloudPreprocessor(pp, self.get_logger())
         self._planner       = CoveragePathPlanner(pl, self.get_logger())
 
+        # ── tf2：监听相机系 → 世界系变换 ──────────────────────
+        self._tf_buffer   = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
+
         # ── 服务：裁剪 ────────────────────────────────────────
         self._crop_srv = self.create_service(
             CropPointCloud,
@@ -628,6 +842,17 @@ class PointCloudProcessorNode(Node):
         self.declare_parameter('preprocess.poisson_depth',               9)
         self.declare_parameter('preprocess.poisson_density_quantile',    0.1)
 
+        # ── 新增：平面去除 + 最大团状工件簇提取 ───────────────
+        self.declare_parameter('preprocess.remove_plane_enable',         True)
+        self.declare_parameter('preprocess.plane_distance_threshold',    0.01)
+        self.declare_parameter('preprocess.plane_ransac_n',              3)
+        self.declare_parameter('preprocess.plane_num_iterations',        1000)
+
+        self.declare_parameter('preprocess.keep_largest_cluster_enable', True)
+        self.declare_parameter('preprocess.cluster_eps',                 0.03)
+        self.declare_parameter('preprocess.cluster_min_points',          30)
+        self.declare_parameter('preprocess.cluster_min_remaining_points', 50)
+
         self.declare_parameter('path_planning.tool_diameter',            0.04)
         self.declare_parameter('path_planning.overlap_ratio',            0.15)
         self.declare_parameter('path_planning.scan_direction',           'x')
@@ -638,6 +863,24 @@ class PointCloudProcessorNode(Node):
         self.declare_parameter('path_planning.outlier_window',           10)
         self.declare_parameter('path_planning.outlier_angle_threshold_deg', 45.0)
         self.declare_parameter('path_planning.normal_display_length',    0.015)
+
+        # ── 坐标系变换参数（相机系 → 世界系）──────────────────
+        # enable          : 是否启用变换。False 时输出仍为相机坐标系。
+        # use_tf          : True  → 通过 tf2 实时查询 source→target 变换；
+        #                   False → 直接使用下方静态参数。
+        # source_frame    : 点云所在坐标系。D435i 直接出图通常为
+        #                   'camera_depth_optical_frame'。
+        # target_frame    : 目标（世界）坐标系，通常为 'world' 或 'base_link'。
+        # lookup_timeout_sec : tf 查询等待超时。
+        # static_translation : 静态平移 [x,y,z]（米），可填手眼标定结果。
+        # static_quaternion  : 静态旋转四元数 [x,y,z,w]。
+        self.declare_parameter('transform.enable',             True)
+        self.declare_parameter('transform.use_tf',             True)
+        self.declare_parameter('transform.source_frame',       'camera_depth_optical_frame')
+        self.declare_parameter('transform.target_frame',       'world')
+        self.declare_parameter('transform.lookup_timeout_sec', 5.0)
+        self.declare_parameter('transform.static_translation', [0.0, 0.0, 0.0])
+        self.declare_parameter('transform.static_quaternion',  [0.0, 0.0, 0.0, 1.0])
 
         self.declare_parameter('node.auto_pipeline', False)
         self.declare_parameter('node.log_level',     'INFO')
@@ -657,6 +900,18 @@ class PointCloudProcessorNode(Node):
             "orient_tangent_k":          self._gp('preprocess.orient_tangent_k'),
             "poisson_depth":             self._gp('preprocess.poisson_depth'),
             "poisson_density_quantile":  self._gp('preprocess.poisson_density_quantile'),
+
+            # 新增：平面去除
+            "remove_plane_enable":       self._gp('preprocess.remove_plane_enable'),
+            "plane_distance_threshold":  self._gp('preprocess.plane_distance_threshold'),
+            "plane_ransac_n":            self._gp('preprocess.plane_ransac_n'),
+            "plane_num_iterations":      self._gp('preprocess.plane_num_iterations'),
+
+            # 新增：最大团状工件簇保留
+            "keep_largest_cluster_enable": self._gp('preprocess.keep_largest_cluster_enable'),
+            "cluster_eps":                 self._gp('preprocess.cluster_eps'),
+            "cluster_min_points":          self._gp('preprocess.cluster_min_points'),
+            "cluster_min_remaining_points": self._gp('preprocess.cluster_min_remaining_points'),
         }
 
     def _build_path_params(self) -> dict:
@@ -671,6 +926,59 @@ class PointCloudProcessorNode(Node):
             "outlier_window":            self._gp('path_planning.outlier_window'),
             "outlier_angle_threshold_deg": self._gp('path_planning.outlier_angle_threshold_deg'),
         }
+
+    # ── 坐标系变换解析 ────────────────────────────────────────
+
+    def _lookup_tf_matrix(self, target: str, source: str):
+        """通过 tf2 查询 source → target 的 4×4 变换矩阵，失败返回 None"""
+        timeout = float(self._gp('transform.lookup_timeout_sec'))
+        try:
+            if not self._tf_buffer.can_transform(
+                    target, source, rclpy.time.Time(),
+                    timeout=Duration(seconds=timeout)):
+                self.get_logger().warn(
+                    f"[Transform] 无法获取 {source} → {target} 的 TF（超时 {timeout}s）")
+                return None
+            ts = self._tf_buffer.lookup_transform(
+                target, source, rclpy.time.Time())
+        except Exception as e:
+            self.get_logger().warn(f"[Transform] TF 查询异常: {e}")
+            return None
+
+        t = ts.transform.translation
+        q = ts.transform.rotation
+        return make_transform_matrix([t.x, t.y, t.z], [q.x, q.y, q.z, q.w])
+
+    def _resolve_transform(self):
+        """
+        根据参数解析出 相机系 → 世界系 的 4×4 变换矩阵。
+        - transform.enable 为 False → 返回 None（不变换）。
+        - use_tf 为 True → 优先用 tf2；失败则回退到静态参数。
+        - use_tf 为 False → 直接使用静态参数。
+        """
+        if not self._gp('transform.enable'):
+            self.get_logger().info("[Transform] 坐标变换已禁用，输出保持相机坐标系")
+            return None
+
+        src = self._gp('transform.source_frame')
+        tgt = self._gp('transform.target_frame')
+
+        if self._gp('transform.use_tf'):
+            T = self._lookup_tf_matrix(tgt, src)
+            if T is not None:
+                self.get_logger().info(
+                    f"[Transform] 通过 TF 获取 {src} → {tgt} 变换成功\n"
+                    f"{np.array2string(T, precision=4, suppress_small=True)}")
+                return T
+            self.get_logger().warn("[Transform] TF 查询失败，回退到静态参数变换")
+
+        trans = list(self._gp('transform.static_translation'))
+        quat  = list(self._gp('transform.static_quaternion'))
+        T = make_transform_matrix(trans, quat)
+        self.get_logger().info(
+            f"[Transform] 使用静态变换 {src} → {tgt}: "
+            f"t={np.round(trans, 4)}, q(xyzw)={np.round(quat, 4)}")
+        return T
 
     # ── 通用动作回调 ──────────────────────────────────────────
 
@@ -760,6 +1068,9 @@ class PointCloudProcessorNode(Node):
         csv_path   = goal.output_csv_path  or self._gp('paths.output_csv')
         gcode_path = goal.output_gcode_path or self._gp('paths.output_gcode')
 
+        # 解析相机系 → 世界系变换（在规划线程内查询 TF）
+        transform = self._resolve_transform()
+
         feedback_msg = PlanCoveragePath.Feedback()
 
         def fb_cb(stage, desc, prog):
@@ -774,7 +1085,8 @@ class PointCloudProcessorNode(Node):
         result = PlanCoveragePath.Result()
         try:
             ok, msg, n_pts, length, cov = self._planner.run(
-                ply_path, csv_path, gcode_path, feedback_cb=fb_cb
+                ply_path, csv_path, gcode_path,
+                feedback_cb=fb_cb, transform=transform
             )
             result.success          = ok
             result.message          = msg
@@ -827,10 +1139,12 @@ class PointCloudProcessorNode(Node):
             return
 
         self.get_logger().info("[auto_pipeline] 步骤 3/3: 路径规划")
+        transform = self._resolve_transform()
         ok, msg, n_pts, length, cov = self._planner.run(
             self._gp('paths.output_ply'),
             self._gp('paths.output_csv'),
-            self._gp('paths.output_gcode')
+            self._gp('paths.output_gcode'),
+            transform=transform
         )
         if ok:
             self.get_logger().info(
